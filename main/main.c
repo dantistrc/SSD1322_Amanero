@@ -907,6 +907,7 @@ SSD1322_DrawAleksFull(35, 20, 1000);/// Пример вызова: X=30 (байт), Y=20 (строка
 SSD1322_DrawString(0, 0, 0,(unsigned char*)"USB DSD 44.1");
 // ============================================================
 
+uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
 
 //===========================================================================================================================================================================
     while (1) {
@@ -914,7 +915,29 @@ SSD1322_DrawString(0, 0, 0,(unsigned char*)"USB DSD 44.1");
         menu_need_update = 0; // Сбрасываем флаг
         Update_Bottom_Line(); // Спокойно и не спеша шлём данные в SPI в фоне!
 
+               // ====================================================================
+        // ОБРАБОТКА ЭНКОДЕРА ГРОМКОСТИ ПРЯМЫМ ХОДОМ
         // ====================================================================
+        if (TIM3->CNT > last_encoder_value) {
+            // Крутанули ВПРАВО — прибавляем звук на 0.5 дБ
+            currentVolume += 0.5f;
+            if (currentVolume > 0.0f) currentVolume = 0.0f; // Ограничение максимума
+            
+            Set_Volume_And_Balance(currentVolume, currentBalance); // Пуляем в ЦАП!
+            menu_need_update = 1; // Флаг на отрисовку экрана
+            last_encoder_value = TIM3->CNT;
+        }
+        else if (TIM3->CNT < last_encoder_value) {
+            // Крутанули ВЛЕВО — убавляем звук на 0.5 дБ
+            currentVolume -= 0.5f;
+            if (currentVolume < -127.5f) currentVolume = -127.5f; // Полная тишина
+            
+            Set_Volume_And_Balance(currentVolume, currentBalance); // Пуляем в ЦАП!
+            menu_need_update = 1;
+            last_encoder_value = TIM3->CNT;
+        }
+
+					// ====================================================================
         // 1. АППАРАТНЫЙ ТАЙМАУТ ОТПУСКАНИЯ КНОПКИ ПУЛЬТА (0.2 сек = 2000 тиков)
         // ====================================================================
         uint16_t current_tick = TIM4->CNT;
@@ -1023,8 +1046,13 @@ Set_Volume_And_Balance(currentVolume, currentBalance);
 
 	
 
-        // ----- ОБРАБОТКА СИГНАЛА ОТ XMOS -----
-        uint8_t signal = UART_XMOS_GetSignal();
+       
+    }
+		
+		
+}
+void Process_XMOS_Signal(void) {												// ----- ОБРАБОТКА СИГНАЛА ОТ XMOS-XU316 pin12 -----
+         uint8_t signal = UART_XMOS_GetSignal();
         if (signal != 0) {
             switch (signal) {
                 case 0x01: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM   44.1kHz"); break;
@@ -1046,103 +1074,4 @@ Set_Volume_And_Balance(currentVolume, currentBalance);
                 case 0x1D: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD1024 45.15"); break;
             }
         }
-    }
-}
-/*		// ============================================================
-// ВЫВОД КОЛИЧЕСТВА БИТОВ В MAIN.C
-// ============================================================
-uint8_t count = 0;
-
-if (IR_GetPacket(&count)) {
-    DebugShow(count); // Показывает общее число импульсов
-}*/
-// ============================================================
-// ============================================================
-//  ТЕСТ ШРИФТА
-// ============================================================
-/*
-SSD1322_ClearBuffer();
-SSD1322_DrawStringBuffer(0, 0, "123456789ABCDEF");//"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-SSD1322_Update(0x10, 0x2F);
-		*/
-		
-/*SSD1322_ClearBuffer();                // очищаем буфер  
-SSD1322_DrawCharBuffer(10, 5, 0, 'f');   // рисуем букву 'A' в координатах (10,10)  
-SSD1322_Update(0x00, 0x1F);            // отправляем на экран
-		
-// ----- 1. Рисуем сырые байты буквы 'A' -----
-uint8_t raw[8];
-for (int i = 0; i < 8; i++) {
-    raw[i] = SmallFont['2' - 0x20][i];
-}
-
-for (int row = 0; row < 8; row++) {
-    for (int col = 0; col < 6; col++) {
-        if (raw[row] & (0x80 >> col)) {
-            SSD1322_DrawPixel(10 + col, 10 + row, 0x0F);
-        }
-    }
-}*/
-/*
-// ----- 2. Рисуем заведомо правильную букву 'А' (контроль) -----
-
-uint8_t test_A[8][6] = {
-    {0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-    {0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-    {0x00, 0x0F, 0x0F, 0x0F, 0x00, 0x00},
-    {0x00, 0x0F, 0x00, 0x0F, 0x00, 0x00},
-    {0x00, 0x0F, 0x0F, 0x0F, 0x00, 0x00},
-    {0x00, 0x0F, 0x00, 0x0F, 0x00, 0x00},
-    {0x00, 0x0F, 0x00, 0x0F, 0x00, 0x00},
-    {0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-};
-
-for (int row = 0; row < 8; row++) {
-    for (int col = 0; col < 6; col++) {
-        if (test_A[row][col]) {
-            SSD1322_DrawPixel(30 + col, 10 + row, 0x0F);
-        }
-    }
-}
-
-SSD1322_Update(0x00, 0x1F); // отправляем верхнюю половину*/
-
-
-
-//------DEBUG DISPLAY------
-//DebugShow(1);   // шаг 1
-
-/*// Симулируем приём пакета: [0xAA, 0x55, 0xFF]
-rx_buffer[0] = 0xAA;
-rx_buffer[1] = 0x55; // Наш last_signal (85 в десятичном виде)
-rx_buffer[2] = 0xFF;
-
-last_signal = rx_buffer[1]; // Записываем 55 в переменную
-new_signal_received = 1;     // Взводим флаг вручную
-*/
-// ============================================================
-
-		/*	if (ir_packet_ready) {
-    char buf[64];
-    char *ptr = buf;
-    for (int i = 0; i < ir_duration_index && i < 10; i++) {
-        ptr += sprintf(ptr, "%lu ", ir_durations[i]);
-    }
-    SSD1322_ClearBuffer();
-    SSD1322_DrawStringBuffer(0, 0, buf);
-    SSD1322_Update(0x00, 0x1F);
-    ir_packet_ready = 0;
-}*/
-			
-		
-	// ----- ПРОВЕРКА I2C (ES9039) -----
-//uint8_t test_addr = 0x48;   // адрес ES9039 (или 0x4A, если ADDR подтянут)
-//I2C2_WriteByte(test_addr, 0x00);  // просто отправляем байт
-// Если чип ответит — он не зависнет, если нет — уйдёт в BUSY
-
-// Вывод результата на экран
-//char i2c_buf[16];
-//sprintf(i2c_buf, "I2C: 0x%02X", test_addr);
-//SSD1322_ClearBuffer();
-//SSD1322_DrawStringBuffer(0, 0, i2c_buf);
-//SSD1322_Update(0x00, 0x1F);
+		}
