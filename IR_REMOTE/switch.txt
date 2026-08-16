@@ -1,0 +1,111 @@
+#include "ir_remote.h"
+#include "stm32f10x.h"
+
+// ============================================================
+//  IR-ПРИЁМНИК: ПРИЁМ 5 БАЙТ (40 БИТ)
+//  Используется TIM3 для замера времени (шаг 10 мкс)
+// ============================================================
+
+#define IR_STATE_IDLE     0   // ждём стартовый LOW (9 мс)
+#define IR_STATE_START    1   // поймали стартовый LOW, ждём HIGH (4.45 мс)
+#define IR_STATE_HIGH     2   // поймали HIGH, переходим к битам
+#define IR_STATE_DATA     3   // собираем биты
+#define IR_STATE_DONE     4   // пакет готов
+#define MAX_DURATIONS     32
+
+volatile uint8_t  ir_state = IR_STATE_IDLE;
+volatile uint8_t  ir_timer_reset = 0;   // флаг: таймер уже сброшен
+volatile uint32_t ir_time_start = 0;
+volatile uint8_t  ir_bit_count = 0;
+volatile uint32_t ir_current_byte = 0;
+volatile uint8_t  ir_byte_index = 0;
+volatile uint8_t  ir_rx_buffer[5];
+volatile uint8_t  ir_packet_ready = 0;
+
+volatile uint32_t ir_durations[MAX_DURATIONS];
+volatile uint8_t  ir_duration_index = 0;
+
+
+// Вызывается из прерывания EXTI по каждому изменению на PB5
+void IR_Process_Bit(void) {
+    // 1. Читаем длительность импульса
+    uint32_t duration = TIM3->CNT;
+    TIM3->CNT = 0;
+
+    // 2. Обработка состояний
+    switch (ir_state) {
+        case IR_STATE_IDLE:
+            // Ждём стартовый LOW (~9 мс)
+            if (duration > 8000 && duration < 10000) {
+                ir_state = IR_STATE_START; // переходим к ожиданию HIGH
+                ir_duration_index = 0;     // сбрасываем счётчик битов
+                ir_bit_count = 0;
+                ir_byte_index = 0;
+                ir_current_byte = 0;
+            }
+            break;
+
+				case IR_STATE_START:
+						if (duration > 400 && duration < 5000) {//if (duration > 4000 && duration < 5000) {
+								ir_state = IR_STATE_DATA;
+						} else if (duration > 500 && duration < 700) {
+								// Это LOW — просто пропускаем
+						} else {
+								ir_state = IR_STATE_IDLE;
+						}
+						break;
+
+        case IR_STATE_DATA:
+            // Здесь мы обрабатываем биты
+            // LOW (~0.64 мс) — просто ждём, ничего не делаем
+            // HIGH — определяем бит по длительности
+            if (duration > 500 && duration < 700) {
+                // Это LOW — пропускаем
+            } else if (duration > 400 && duration < 600) {
+                // Короткий HIGH (~0.49 мс) > логический 0
+                ir_current_byte = (ir_current_byte << 1) | 0;
+                ir_bit_count++;
+            } else if (duration > 1400 && duration < 1800) {
+                // Длинный HIGH (~1.6 мс) > логический 1
+                ir_current_byte = (ir_current_byte << 1) | 1;
+                ir_bit_count++;
+            } else {
+                // Невалидный импульс — сброс
+                ir_state = IR_STATE_IDLE;
+                return;
+            }
+
+            // Если набрали 8 бит — сохраняем байт
+            if (ir_bit_count == 8) {
+                ir_rx_buffer[ir_byte_index++] = ir_current_byte & 0xFF;
+                ir_current_byte = 0;
+                ir_bit_count = 0;
+
+                // Если набрали 5 байт — пакет готов
+                if (ir_byte_index >= 5) {
+                    ir_state = IR_STATE_DONE;
+                    ir_packet_ready = 1;
+                }
+            }
+            break;
+
+        case IR_STATE_DONE:
+            // Пакет принят. Ждём завершения (длинный HIGH или пауза)
+            if (duration > 2000) {
+                ir_state = IR_STATE_IDLE;
+            }
+            break;
+    }
+}
+
+// Функция для проверки, есть ли готовый пакет
+uint8_t IR_GetPacket(uint8_t *buffer) {
+    if (ir_packet_ready) {
+        ir_packet_ready = 0;
+        for (int i = 0; i < 5; i++) {
+            buffer[i] = ir_rx_buffer[i];
+        }
+        return 1;
+    }
+    return 0;
+}

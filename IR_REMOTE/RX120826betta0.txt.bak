@@ -1,0 +1,73 @@
+#include "ir_remote.h"
+#include "stm32f10x.h"
+
+// ============================================================
+//  IR-ПРИЁМНИК: ПРИЁМ 5 БАЙТ (40 БИТ)
+//  Используется TIM3 для замера времени (шаг 10 мкс)
+// ============================================================
+
+#define IR_STATE_IDLE     0
+#define IR_STATE_START    1
+#define IR_STATE_DATA     2
+#define IR_STATE_DONE     3
+#define MAX_DURATIONS 		32
+
+volatile uint8_t  ir_state = IR_STATE_IDLE;
+volatile uint8_t  ir_timer_reset = 0;   // флаг: таймер уже сброшен
+volatile uint32_t ir_time_start = 0;
+volatile uint8_t  ir_bit_count = 0;
+volatile uint32_t ir_current_byte = 0;
+volatile uint8_t  ir_byte_index = 0;
+volatile uint8_t  ir_rx_buffer[5];
+volatile uint8_t  ir_packet_ready = 0;
+
+volatile uint32_t ir_durations[MAX_DURATIONS];
+volatile uint8_t  ir_duration_index = 0;
+
+
+// Вызывается из прерывания EXTI по каждому изменению на PB5
+void IR_Process_Bit(void) {
+	
+	
+	// 1. Читаем текущее значение таймера
+    uint32_t duration = TIM3->CNT;
+    TIM3->CNT = 0;   // сбрасываем таймер в ноль
+
+    // 2. Если мы ещё не набрали нужное количество импульсов — сохраняем
+    if (ir_duration_index < MAX_DURATIONS) {
+        ir_durations[ir_duration_index++] = duration;
+    }
+		if (duration > 150000) {  // 150 мс (при PSC=719, шаг 10 мкс)
+				// Сброс — начинаем заново
+				ir_duration_index = 0;
+				ir_state = IR_STATE_IDLE;
+				ir_timer_reset = 0;
+		}
+    // 3. Определяем, что это за импульс по длительности
+    // Стартовый LOW (~9 мс)
+    if (duration > 8000 && duration < 10000) {
+        // Это стартовый импульс — просто пропускаем, но сохраняем
+        // Можно сбросить индекс, чтобы начать собирать новые данные
+        ir_duration_index = 0;
+        ir_packet_ready = 0;
+    }
+
+    // Если набрали достаточное количество импульсов (например, 10) — помечаем пакет готовым
+    if (ir_duration_index >= 10) {
+        ir_packet_ready = 1;
+    }
+	
+
+}
+
+// Функция для проверки, есть ли готовый пакет
+uint8_t IR_GetPacket(uint8_t *buffer) {
+    if (ir_packet_ready) {
+        ir_packet_ready = 0;
+        for (int i = 0; i < 5; i++) {
+            buffer[i] = ir_rx_buffer[i];
+        }
+        return 1;
+    }
+    return 0;
+}

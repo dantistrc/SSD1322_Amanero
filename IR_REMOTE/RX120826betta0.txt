@@ -1,0 +1,92 @@
+#include "ir_remote.h"
+#include "stm32f10x.h"
+
+// ============================================================
+//  АВТОМАТ ДЛЯ ПРИЁМА И РАСПАКОВКИ ВСЕХ 4 БАЙТ ПАКЕТА NEC
+//  Настройка EXTI: строго по СПАДУ (Falling Edge)
+//  Таймер TIM3: PSC = 719 (шаг счета 10 мкс)
+// ============================================================
+// ============================================================
+volatile uint32_t ir_durations[32];
+volatile uint8_t  ir_duration_index = 0;
+// ============================================================
+
+#define IR_STATE_IDLE     0  // Ожидание стартового спада
+#define IR_STATE_DATA     1  // Приём 32 битов данных
+
+volatile uint8_t  ir_state = IR_STATE_IDLE;
+volatile uint8_t  ir_bit_count = 0;
+volatile uint32_t ir_current_packet = 0; // Сюда собираем все 32 бита
+volatile uint8_t  ir_packet_ready = 0;
+volatile uint8_t  ir_rx_buffer[4];       // Буфер под все 4 байта пульта
+
+// ============================================================
+//  ОБРАБОТЧИК ПРЕРЫВАНИЯ EXTI (Вызывается по спаду на ноге пульта)
+// ============================================================
+void IR_Process_Bit(void) {
+    uint32_t duration = TIM3->CNT;
+    TIM3->CNT = 0; // Мгновенно обнуляем таймер для следующего замера
+
+    switch (ir_state) {
+        
+        // ШАГ 1: Ловим стартовый период (9 мс LOW + 4.5 мс HIGH = 13.5 мс)
+        case IR_STATE_IDLE:
+            // 13.5 мс — это чистые 1350 единиц. Ворота: 1200 - 1500
+            if (duration > 1200 && duration < 1500) {
+                ir_state = IR_STATE_DATA; // Старт пойман, включаем прием бит
+                ir_bit_count = 0;
+                ir_current_packet = 0;    // Обнуляем накопительный регистр
+            }
+            break;
+
+        // ШАГ 2: Ловим длительности всех 32 битов подряд
+        case IR_STATE_DATA:
+            // Защита от помех: период бита должен быть в рамках 80 - 280
+            if (duration < 80 || duration > 280) {
+                ir_state = IR_STATE_IDLE; // Помеха, сброс в начало
+                break;
+            }
+
+            // Фирменный сдвиг всей 32-битной посылки вправо
+            ir_current_packet >>= 1;
+
+            // Порог разделения нуля (~112) и единицы (~224): 160 (1.6 мс)
+            if (duration > 160) {
+                ir_current_packet |= 0x80000000; // Ставим "1" в самый старший бит
+            }
+
+            ir_bit_count++;
+
+            // Как только приняли все 32 бита (4 байта)
+            if (ir_bit_count >= 32) {
+                // Раскладываем собранную 32-битную «колбасу» на 4 чистых байта
+                ir_rx_buffer[0] = (uint8_t)(ir_current_packet & 0xFF);         // 1-й байт
+                ir_rx_buffer[1] = (uint8_t)((ir_current_packet >> 8) & 0xFF);  // 2-й байт
+                ir_rx_buffer[2] = (uint8_t)((ir_current_packet >> 16) & 0xFF); // 3-й байт (обычно команда)
+                ir_rx_buffer[3] = (uint8_t)((ir_current_packet >> 24) & 0xFF); // 4-й байт
+                
+                ir_packet_ready = 1;      // Маяк для main.c
+                ir_state = IR_STATE_IDLE; // Возврат в ожидание нового нажатия
+            }
+            break;
+
+        default:
+            ir_state = IR_STATE_IDLE;
+            break;
+    }
+}
+
+// ============================================================
+//  ФУНКЦИЯ ДЛЯ ЗАБОРA ВСЕГО ПАКЕТА В MAIN.C
+// ============================================================
+uint8_t IR_GetPacket(uint8_t *buffer) {
+    if (ir_packet_ready) {
+        ir_packet_ready = 0;
+        for (int i = 0; i < 4; i++) {
+            buffer[i] = ir_rx_buffer[i]; // Копируем все 4 байта в твой буфер
+        }
+        return 1; // Успех
+    }
+    return 0; // Данных нет
+}
+// ============================================================

@@ -1,0 +1,44 @@
+// ============================================================
+// ”Ќ»¬≈–—јЋ№Ќџ… —„≈“„»  »ћѕ”Ћ№—ќ¬ ƒЋя Ќ≈»«¬≈—“Ќџ’ ѕ”Ћ№“ќ¬
+// ============================================================
+
+void IR_Process_Bit(void) {
+    uint32_t duration = TIM3->CNT;
+    TIM3->CNT = 0; 
+
+    // ≈сли кнопка отпущена и тишина больше 300 мс (30000 ед),
+    // значит посылка закончилась Ч отдаем результат в main.c
+    if (duration > 30000) {
+        if (ir_bit_count > 0) {
+            ir_rx_buffer[0] = ir_bit_count; // «апишем количество пойманных бит
+            ir_packet_ready = 1;
+        }
+        ir_state = IR_STATE_IDLE;
+        ir_bit_count = 0;
+        return;
+    }
+
+    switch (ir_state) {
+        
+        case IR_STATE_IDLE:
+            // Ћовим любой стартовый импульс длиннее 4 мс (400 ед)
+            if (duration > 400) {
+                ir_state = IR_STATE_DATA;
+                ir_bit_count = 0;
+            }
+            break;
+
+        case IR_STATE_DATA:
+            // ѕросто считаем каждый прилетевший спад
+            ir_bit_count++;
+            
+            // «ащита от переполнени€ буфера (если битов слишком много)
+            if (ir_bit_count >= 250) {
+                ir_rx_buffer[0] = ir_bit_count;
+                ir_packet_ready = 1;
+                ir_state = IR_STATE_IDLE;
+            }
+            break;
+    }
+}
+// ============================================================
