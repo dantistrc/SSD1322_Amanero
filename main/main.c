@@ -110,6 +110,7 @@ uint8_t ir_cmd = 0;
 #define IR_PIN  GPIO_Pin_5
 #define IR_PORT GPIOB
 #define IR_CLK  RCC_APB2ENR_IOPBEN
+#define FLASH_PRESET_ADDR   0x0800FC00
 
 /* ============================================================
 		JSA
@@ -144,25 +145,26 @@ volatile uint8_t button_pressed = 0;   // флаг нажатия
 /* ============================================================
    5.  РАБОТА С FLASH-ПАМЯТЬЮ (сохранение настроек)
    ============================================================ */
-
 /*
  *  Структура для хранения настроек в Flash.
- *  Адрес: 0x8005000 (последняя страница Flash).
+ *  Адрес:  #define FLASH_PRESET_ADDR   0x0800FC00.
  */
 
 typedef struct {
-    int16_t input_select;   // 2 байта
-    int16_t digital_filter; // 2 байта
-    int16_t contrast;       // 2 байта
-    int16_t volume_int;     // 2 байта (СЮДА ПИШЕМ ГРОМКОСТЬ * 10)
-    int16_t balance_int;    // 2 байта (СЮДА ПИШЕМ БАЛАНС * 10)
+    uint8_t input_select;      // 1 байт: Выбор входа
+    uint8_t digital_filter;    // 1 байт: Цифровой фильтр
+    uint8_t contrast;          // 1 байt: Яркость OLED
+    uint8_t volume_steps;      // 1 байт: Громкость в шагах (от 0 до 255)
+    uint8_t balance_steps;     // 1 байт: Баланс в шагах
+    uint8_t reserve1;          // 1 байт: Пустышка для выравнивания
+    uint8_t reserve2;          // 1 байт: Пустышка для выравнивания
+    uint8_t reserve3;          // 1 байт: Пустышка для выравнивания
 } presets_def;
+#define PRESET_WORD_CNT  sizeof(preset) / sizeof(uint32_t)
 
-volatile presets_def preset;
+static presets_def preset;
 
 
-
-#define PRESET_WORD_CNT 	sizeof(preset) / sizeof(uint32_t)
 
 /**
   * @brief  Чтение настроек из Flash
@@ -171,7 +173,7 @@ volatile presets_def preset;
   */
 void FLASH_ReadSettings(void) {
     uint16_t p;
-    uint32_t *source_adr = (uint32_t *)(0x8005000);
+    uint32_t *source_adr = (uint32_t *)(FLASH_PRESET_ADDR);
     uint32_t *dest_adr = (void *)&preset;
 
     for (p = 0; p < PRESET_WORD_CNT; ++p) {
@@ -186,7 +188,7 @@ void FLASH_ReadSettings(void) {
   */
 void FLASH_WriteSettings(void) {
     uint8_t i;
-    uint32_t pageAdr = 0x8005000;
+		uint32_t pageAdr = FLASH_PRESET_ADDR;
     uint32_t *source_adr = (void *)&preset;
 
     FLASH_Unlock();
@@ -195,60 +197,6 @@ void FLASH_WriteSettings(void) {
         FLASH_ProgramWord((uint32_t)(pageAdr + i * 4), *(source_adr + i));
     }
     FLASH_Lock();
-}
-// ТОЧЕЧНОЕ ЧТЕНИЕ ОДНОГО 32-БИТНОГО СЛОВА ИЗ ФЛЕШ
-uint32_t FLASH_Read_Word(uint32_t address) {
-    return *(volatile uint32_t*)address;
-}
-
-// ТОЧЕЧНАЯ ЗАПИСЬ ОДНОГО 32-БИТНОГО СЛОВА ВО ФЛЕШ
-void FLASH_Write_Word(uint32_t address, uint32_t data) {
-    // 1. Проверяем, нужно ли вообще писать? Если там уже лежат эти данные, выходим!
-    // Это экономит ресурс флеша на 90%
-    if (*(volatile uint32_t*)address == data) return; 
-    
-    // 2. Разблокируем флеш перед записью
-    FLASH->KEYR = 0x45670123;
-    FLASH->KEYR = 0xCDEF89AB;
-    
-    // 3. Перед записью в STM32 нужно стереть страницу (0x08005000 - начало страницы)
-    // ВАЖНО: Страница стирается целиком, поэтому перед стиранием мы должны сохранить 
-    // остальные параметры в оперативку, чтобы не стереть их насовсем!
-    // Для этого мы временно считываем все 5 параметров в буфер:
-    uint32_t buf[5];
-    buf[0] = FLASH_Read_Word(0x08005000); // Вход
-    buf[1] = FLASH_Read_Word(0x08005004); // Фильтр
-    buf[2] = FLASH_Read_Word(0x08005008); // Контраст
-    buf[3] = FLASH_Read_Word(0x0800500C); // Громкость
-    buf[4] = FLASH_Read_Word(0x08005010); // Баланс
-    
-    // Подменяем в буфере точечно тот параметр, который хотим обновить
-    if (address == 0x08005000) buf[0] = data;
-    else if (address == 0x08005004) buf[1] = data;
-    else if (address == 0x08005008) buf[2] = data;
-    else if (address == 0x0800500C) buf[3] = data;
-    else if (address == 0x08005010) buf[4] = data;
-
-    // Стираем страницу 0x08005000
-    while (FLASH->SR & FLASH_SR_BSY);
-    FLASH->CR |= FLASH_CR_PER;
-    FLASH->AR = 0x08005000;
-    FLASH->CR |= FLASH_CR_STRT;
-    while (FLASH->SR & FLASH_SR_BSY);
-    FLASH->CR &= ~FLASH_CR_PER;
-    
-    // Прошиваем весь буфер обратно (уже с измененным одним параметром)
-    FLASH->CR |= FLASH_CR_PG;
-    for (uint8_t i = 0; i < 5; i++) {
-        *(volatile uint16_t*)(0x08005000 + (i * 4)) = (uint16_t)(buf[i] & 0xFFFF);
-        while (FLASH->SR & FLASH_SR_BSY);
-        *(volatile uint16_t*)(0x08005002 + (i * 4)) = (uint16_t)((buf[i] >> 16) & 0xFFFF);
-        while (FLASH->SR & FLASH_SR_BSY);
-    }
-    FLASH->CR &= ~FLASH_CR_PG;
-    
-    // Блокируем флеш обратно
-    FLASH->CR |= FLASH_CR_LOCK;
 }
 
 /* ============================================================
