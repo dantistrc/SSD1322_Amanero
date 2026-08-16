@@ -285,7 +285,7 @@ void I2C2_Init(void) {
   * @retval None
   */
 void I2C2_WriteByte(uint8_t addr, uint8_t data) {
-    while (I2C2->SR2 & I2C_SR2_BUSY);
+    //while (I2C2->SR2 & I2C_SR2_BUSY);
     I2C2->CR1 |= I2C_CR1_START;
     while (!(I2C2->SR1 & I2C_SR1_SB));
     I2C2->DR = (addr << 1);
@@ -829,7 +829,7 @@ int main(void) {
         preset.volume_int = -400; // İòî íàøè -40.0 äÁ, óìíîæåííûå íà 10
         preset.balance_int = 0;   // Áàëàíñ 0
         
-        FLASH_WriteSettings();
+      //  FLASH_WriteSettings();
     // }
     
     // ĞÀÑÊÈÄÛÂÀÅÌ ÈÇ ÑÒĞÓÊÒÓĞÛ ÏÎ ĞÀÁÎ×ÈÌ ÏÅĞÅÌÅÍÍÛÌ
@@ -930,10 +930,11 @@ SSD1322_DrawString(0, 0, 0,(unsigned char*)"USB DSD 44.1");
         // 2. ÎÁĞÀÁÎÒÊÀ ÈÊ-ÏÓËÜÒÀ (Ïğèâÿçêà ê êíîïêàì è ïëàâíîìó óäåğæàíèş)
         // ====================================================================
         if (IR_GetPacket(remote_packet)) {
-            
+                ir_cmd = remote_packet[2]; // Äîñòàåì 3-é áàéò êîìàíäû èç ïğèëåòåâøåãî ïàêåòà!
+
             // Åñëè ïğèëåòåë ïàêåò (èëè óäåğæèâàåòñÿ ñòàğûé) - âû÷èñëÿåì äåéñòâèå
             // Â Watch-îêíå Keil ìû ëîâèì 3-é áàéò êîìàíäû: remote_packet[3]
-            uint8_t ir_cmd = remote_packet[3];
+           // uint8_t ir_cmd = remote_packet[3];
             
             switch (ir_cmd) {
                 case 0x1E: // ÏĞÈÌÅĞ: Êíîïêà "Ãğîìêîñòü +"

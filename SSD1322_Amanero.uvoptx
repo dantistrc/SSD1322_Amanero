@@ -152,9 +152,25 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>784</LineNumber>
+          <LineNumber>35</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134222192</Address>
+          <Address>134232048</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\IR_REMOTE\ir_remote.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\SSD1322_Amanero\IR_REMOTE/ir_remote.c\35</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>817</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134222564</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -163,23 +179,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\main\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\SSD1322_Amanero\main/main.c\784</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>822</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>.\main\main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
+          <Expression>\\SSD1322_Amanero\main/main.c\817</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -261,22 +261,17 @@
         <Ww>
           <count>15</count>
           <WinNumber>1</WinNumber>
-          <ItemText>preset.volume</ItemText>
+          <ItemText>preset.digital_filter</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>1</WinNumber>
-          <ItemText>preset.balance</ItemText>
+          <ItemText>preset.input_select</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>1</WinNumber>
-          <ItemText>preset.digital_filter</ItemText>
-        </Ww>
-        <Ww>
-          <count>18</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>preset.input_select</ItemText>
+          <ItemText>ir_cmd</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
