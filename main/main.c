@@ -252,9 +252,10 @@ void Update_Bottom_Line(void) {
             
         case 1: // MODE_INPUT
             // Выводим реальный вход в зависимости от input_val
-            if (input_val == 0)      sprintf(buf, "IN: USB      ");
-            else if (input_val == 1) sprintf(buf, "IN: COA      ");
-            else                     sprintf(buf, "IN: OPT      ");
+            if (input_val == 0)      SSD1322_DrawString(0, 44, 1, (unsigned char*)"IN: USB ");
+						else if (input_val == 1) SSD1322_DrawString(0, 44, 1, (unsigned char*)"IN: COA ");
+						else                     SSD1322_DrawString(0, 44, 1, (unsigned char*)"IN: OPT ");
+
             break;
             
         case 2: // MODE_FILTER
@@ -610,8 +611,8 @@ void Set_Volume_And_Balance(uint8_t volume_val, uint8_t balance_val) {
     uint8_t regRight = (uint8_t)calcRight;
     
     // 4. ОТПРАВЛЯЕМ В РЕГИСТРЫ ЦАПА ПО I2C
-    ESS9028_WriteReg(ESS9028_I2C_ADDR, 15, regLeft);  // Левый канал
-    ESS9028_WriteReg(ESS9028_I2C_ADDR, 16, regRight); // Правый канал
+    //ESS9028_WriteReg(ESS9028_I2C_ADDR, 15, regLeft);  // Левый канал
+    //ESS9028_WriteReg(ESS9028_I2C_ADDR, 16, regRight); // Правый канал
 }
 
 /**

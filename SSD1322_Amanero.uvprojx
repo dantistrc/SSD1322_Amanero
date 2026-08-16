@@ -338,8 +338,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-mfloat-abi=soft
-</MiscControls>
+              <MiscControls>-mfloat-abi=soft</MiscControls>
               <Define>STM32F10X_MD USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
               <IncludePath>.\cmsis;.\cmsis_boot;.\main;.\GPIO;.\Delay;.\STM32F10x_StdPeriph_Driver\inc;.\STM32F10x_StdPeriph_Driver\src;.\SPI_SSD1322\inc;.\DispPort\inc;.\cmsis_boot\startup;.\Encoder;.\ControlPort\inc;./UART_XMOS;./IR_REMOTE</IncludePath>
