@@ -29,11 +29,7 @@ volatile uint8_t menu_need_update = 0; // Этот флаг крутит ТОЛЬКО нижнее меню (к
 volatile uint8_t ir_need_update = 0;   // А этот флаг крутит ТОЛЬКО верхний вывод пульта
 volatile uint32_t ir_timeout_ms = 0; // Часы времени от последнего чиха пульта
 volatile uint16_t ir_last_tick = 0; // Время последнего импульса пульта
-// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ УПРАВЛЕНИЯ ЦАПОМ
-volatile float currentVolume = -40.0f; // Стартовая громкость в дБ (от -127.5 до 0.0)
-volatile float currentBalance = 0.0f;  // Баланс (от -10.0 до +10.0)
-volatile uint8_t currentInput = 1;     // Текущий вход (1 - USB, 2 - Coaxial, 3 - Optical)
-volatile uint8_t currentFilter = 0;    // Текущий цифровой фильтр (0..6)
+void Set_Volume_And_Balance(uint8_t volume_val, uint8_t balance_val);
 
 
 /* ============================================================
@@ -112,23 +108,15 @@ uint8_t ir_cmd = 0;
 #define IR_CLK  RCC_APB2ENR_IOPBEN
 #define FLASH_PRESET_ADDR   0x0800FC00
 #define PRESET_WORD_CNT  2
-
+#define ESS9028_I2C_ADDR   0x48 // Адрес ЦАПа на шине I2C
 /* ============================================================
 		JSA
    ============================================================ */
-// Состояния для нижней динамической строки меню
-#define MODE_VOLUME  0
-#define MODE_INPUT   1
-#define MODE_FILTER  2
-#define MODE_BALANCE 3
-
-uint8_t current_mode = MODE_VOLUME; // Стартуем в режиме громкости
+uint8_t menu_mode_val = 0; // Стартуем в режиме громкости
 uint8_t volume_val = 40;  // Стартовая громкость
 uint8_t input_val = 0;   // Стартовый вход (0-USB, 1-COA, 2-OPT)
 uint8_t filter_val = 0;  // Стартовый фильтр ЦАПа
 int8_t  balance_val = 0; // Стартовый баланс (ноль — центр)
-
-
 /* ============================================================
    3.  ВСПОМОГАТЕЛЬНЫЕ БУФЕРЫ
    ============================================================ */
@@ -256,7 +244,7 @@ void I2C2_WriteByte(uint8_t addr, uint8_t data) {
 void Update_Bottom_Line(void) {
     char buf[16];
     
-        switch (current_mode) {
+        switch (menu_mode_val) {
         case 0: // MODE_VOLUME
             // Передаем реальную громкость из volume_val вместо статической 24
             SSD1322_DrawString(0, 20, 1,(unsigned char*)"USB DSD 44.1");//sprintf(buf, "VOL: -%d dB ", volume_val); 
@@ -295,13 +283,13 @@ void Process_Encoder_Rotation(uint8_t direction) {
     static uint8_t filter = 0;   
 
     if (direction) { // Крутим вправо (увеличение)
-        switch (current_mode) {
+        switch (menu_mode_val) {
             case 0: if (vol < 100) vol++; break;
             case 1: input = (input + 1) % 3; break; // USB -> COA -> OPT
             case 2: if (filter < 7) filter++; break; // Всего 8 фильтров у ESS9039
         }
     } else { // Крутим влево (уменьшение)
-        switch (current_mode) {
+        switch (menu_mode_val) {
             case 0: if (vol > 0) vol--; break;
             case 1: input = (input == 0) ? 2 : (input - 1); break;
             case 2: if (filter > 0) filter--; break;
@@ -348,16 +336,16 @@ if (is_long) {
     while ((GPIOA->IDR & (1 << 6)) == 0) { __NOP(); }
     
     // Смотрим, в каком пункте меню мы зажали кнопку, и обновляем только его в структуре:
-    if (current_mode == 0) {
+    if (menu_mode_val == 0) {
         preset.volume_int = volume_val;   // Запоминаем только громкость
     }
-    else if (current_mode == 1) {
+    else if (menu_mode_val == 1) {
         preset.input_select = input_val;  // Запоминаем только вход
     }
-    else if (current_mode == 2) {
+    else if (menu_mode_val == 2) {
         preset.digital_filter = filter_val; // Запоминаем только фильтр
     }
-    else if (current_mode == 3) {
+    else if (menu_mode_val == 3) {
         preset.balance_int = balance_val;  // Запоминаем только баланс
     }
     
@@ -371,15 +359,17 @@ if (is_long) {
 else {
     // ВАРИАНТ 1: КОРОТКИЙ КЛИК
 		menu_level = 1; // Активируем меню, чтобы TIM2 пустил нас к крутилке!
-    current_mode++;
-    if (current_mode > 3) {
-        current_mode = 0; // Наша громкость MODE_VOLUME
+    menu_mode_val++;
+    if (menu_mode_val > 3) {
+        menu_mode_val = 0; // Наша громкость MODE_VOLUME
     }
    menu_need_update = 1; // Просто машем флажком, это занимает 1 такт процессора
 // Update_Bottom_Line();																					//rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrIRrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
 		}
 
 }
+
+
 //==================================================== E N D = J S A ============================================================
 
 
@@ -457,7 +447,7 @@ void TIM2_IRQHandler(void) {
 // Заменяем старый блок навигации по уровням
 if (enc_direction) {
     // --- КРУТИМ ВПРАВО (ВЕЛИЧЕНИЕ) ---
-    switch (current_mode) {
+    switch (menu_mode_val) {
         case 0: // Громкость
             if (volume_val < 100) volume_val++;
             break;
@@ -473,7 +463,7 @@ if (enc_direction) {
     }
 } else {
     // --- КРУТИМ ВЛЕВО (УМЕНЬШЕНИЕ) ---
-    switch (current_mode) {
+    switch (menu_mode_val) {
         case 0: // Громкость
             if (volume_val > 0) volume_val--;
             break;
@@ -542,35 +532,6 @@ void ESS9028_WriteReg(uint8_t chip_addr, uint8_t reg, uint8_t data) {
     I2C2->CR1 |= I2C_CR1_STOP; // Убрали двойку из маски флага
 }
 
- // */=================================Громкость баланс===========================================
-//*
-#define ESS9028_I2C_ADDR   0x48 // Адрес ЦАПа на шине I2C
-
-void Set_Volume_And_Balance(float currentVolume, float currentBalance) {
-    float volumeLeft = currentVolume;
-    float volumeRight = currentVolume;
-    
-    uint8_t regLeft;
-    uint8_t regRight;
-
-    //  РАСЧЕТ БАЛАНСА
-    if (currentBalance < 0.0f) {
-        // Баланс влево: душим ПРАВЫЙ канал
-        volumeRight += (currentBalance * 0.5f); 
-    } 
-    else if (currentBalance > 0.0f) {
-        // Баланс вправо: душим ЛЕВЫЙ канал
-        volumeLeft -= (currentBalance * 0.5f);
-    }
-
-    //  ФОРМУЛА ПЕРЕВОДА В БАЙТЫ ЦАПА
-    regLeft  = (uint8_t)(volumeLeft * -2.0f);
-    regRight = (uint8_t)(volumeRight * -2.0f);
-
-    //  В РЕГИСТРЫ ПО I2C2
-    ESS9028_WriteReg(ESS9028_I2C_ADDR, 15, regLeft);  // 15 - Левый канал
-    ESS9028_WriteReg(ESS9028_I2C_ADDR, 16, regRight); // 16 - Правый канал
-}
 
 
 //*/===========================Переключение фильтров=================================================
@@ -584,7 +545,7 @@ void ESS9028_SetFilter(uint8_t filter_num) {
     // Добавляем дефолтные настройки для остальных битов регистра 7 (например, оставляем DSD/OSF)
     reg_val |= 0x0C; 
     
-    currentFilter = filter_num; // Запоминаем в систему
+    filter_val = filter_num; // Запоминаем в систему
     
     // Выстрел в регистр 7 чипа по I2C
     ESS9028_WriteReg(ESS9028_I2C_ADDR, 7, reg_val);
@@ -616,69 +577,49 @@ void ESS9028_SetInput(uint8_t input_num) {
             break;
     }
     
-    currentInput = input_num; // Фиксируем в памяти
+    input_val = input_num; // Фиксируем в памяти
     
     // Выстрел в регистр 1 по I2C
     ESS9028_WriteReg(ESS9028_I2C_ADDR, 1, reg_val);
 }
 
 
+ // */=================================Громкость баланс===========================================
+void Set_Volume_And_Balance(uint8_t volume_val, uint8_t balance_val) {
+    // 1. ПЕРЕВОДИМ НАШУ ГРОМКОСТЬ В БАЗОВЫЕ БАЙТЫ ЦАПА (РАЗВОРАЧИВАЕМ ШКАЛУ)
+    int16_t calcLeft  = 255 - volume_val;
+    int16_t calcRight = 255 - volume_val;
+    
+    // 2. РАСЧЕТ БАЛАНСА НА ЧИСТЫХ ЦЕЛЫХ ЧИСЛАХ (127 - ЦЕНТР)
+    if (balance_val < 127) {
+        // Баланс влево: душим ПРАВЫЙ канал
+        calcRight += (127 - balance_val);
+    }
+    else if (balance_val > 127) {
+        // Баланс вправо: душим ЛЕВЫЙ канал
+        calcLeft += (balance_val - 127);
+    }
+    
+    // 3. ПРОВЕРЯЕМ ГРАНИЦЫ И ЗАПИСЫВАЕМ В БЕЗЗНАКОВЫЕ БАЙТЫ РЕГИСТРОВ
+    if (calcLeft > 255)  calcLeft = 255;  // Полная тишина, если пережали балансом
+    if (calcLeft < 0)    calcLeft = 0;    // Максимальный звук
+    if (calcRight > 255) calcRight = 255;
+    if (calcRight < 0)   calcRight = 0;
+    
+    uint8_t regLeft  = (uint8_t)calcLeft;
+    uint8_t regRight = (uint8_t)calcRight;
+    
+    // 4. ОТПРАВЛЯЕМ В РЕГИСТРЫ ЦАПА ПО I2C
+    ESS9028_WriteReg(ESS9028_I2C_ADDR, 15, regLeft);  // Левый канал
+    ESS9028_WriteReg(ESS9028_I2C_ADDR, 16, regRight); // Правый канал
+}
+
 /**
   * @brief  Вывод информации о входе и частоте (главный экран)
   * @param  None
   * @retval None
   */
-/*void STREAM_LCD(void) {
-    if (!updated) { updated = 1; SSD1322_ClearRAM(); }
 
-    if (!input_select) {
-        switch (Stream_ID()) {
-            case 0x01: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM   44.1kHz"); break;
-            case 0x02: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM     48kHz"); break;
-            case 0x03: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM   88.2kHz"); break;
-            case 0x04: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM     96kHz"); break;
-            case 0x05: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM  176.4kHz"); break;
-            case 0x06: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM    192kHz"); break;
-            case 0x07: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM  352.8kHz"); break;
-            case 0x08: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM    384kHz"); break;
-            case 0x09: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM  705.6kHz"); break;
-            case 0x0A: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM    768kHz"); break;
-            case 0x0B: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM  1411.2kHz"); break;
-            case 0x0C: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM    1536kHz"); break;
-            case 0x19: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD64   2.822"); break;
-            case 0x1A: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD128  5.644"); break;
-            case 0x1B: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD256 11.289"); break;
-            case 0x1C: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD512 22.579"); break;
-            case 0x1D: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD1024 45.15"); break;
-        }
-    } else {
-        SSD1322_DrawString(0, 5, 0, (unsigned char*)"S/PDIF  INPUT");
-    }
-}*/
-
-/**
-  * @brief  Вывод информации о фильтре и входе
-  * @param  None
-  * @retval None
-  */
-/*void INPUT_FLT_LCD(void) {
-    if (!input_select) {
-        switch (dig_flt) {
-            case 0x00: SSD1322_DrawString(0, 40, 0,  (unsigned char*)"USB     SHARP"); break;
-            case 0x01: SSD1322_DrawString(0, 40, 0, (unsigned char*)"USB      SLOW"); break;
-            case 0x02: SSD1322_DrawString(0, 40, 0, (unsigned char*)"USB  SHARP SD"); break;
-            case 0x03: SSD1322_DrawString(0, 40, 0, (unsigned char*)"USB   SLOW SD"); break;
-        }
-    } else {
-        switch (dig_flt) {
-            case 0x00: SSD1322_DrawString(0, 40, 0, (unsigned char*)"SHARP    DGFL"); break;
-            case 0x01: SSD1322_DrawString(0, 40, 0, (unsigned char*)"SLOW     DGFL"); break;
-            case 0x02: SSD1322_DrawString(0, 40, 0, (unsigned char*)"SHARP SD DGFL"); break;
-            case 0x03: SSD1322_DrawString(0, 40, 0, (unsigned char*)"SLOW SD  DGFL"); break;
-        }
-    }
-}
-*/
 /**
   * @brief  Вывод сообщения о Mute
   * @param  None
@@ -884,19 +825,17 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
         // ====================================================================
         if (TIM3->CNT > last_encoder_value) {
             // Крутанули ВПРАВО — прибавляем звук на 0.5 дБ
-            currentVolume += 0.5f;
-            if (currentVolume > 0.0f) currentVolume = 0.0f; // Ограничение максимума
-            
-            Set_Volume_And_Balance(currentVolume, currentBalance); // Пуляем в ЦАП!
+            volume_val += 1;
+            if (volume_val > 255) volume_val = 255; // Наш честный максимум байта
+            Set_Volume_And_Balance(volume_val, balance_val); // Пуляем в ЦАП!
             menu_need_update = 1; // Флаг на отрисовку экрана
             last_encoder_value = TIM3->CNT;
         }
         else if (TIM3->CNT < last_encoder_value) {
             // Крутанули ВЛЕВО — убавляем звук на 0.5 дБ
-            currentVolume -= 0.5f;
-            if (currentVolume < -127.5f) currentVolume = -127.5f; // Полная тишина
-            
-            Set_Volume_And_Balance(currentVolume, currentBalance); // Пуляем в ЦАП!
+            volume_val -= 1;
+            if (volume_val == 0 || volume_val > 255) volume_val = 0; // Безопасный стоп на полной тишине   
+            Set_Volume_And_Balance(volume_val, balance_val); // Пуляем в ЦАП!
             menu_need_update = 1;
             last_encoder_value = TIM3->CNT;
         }
@@ -924,35 +863,30 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
            // uint8_t ir_cmd = remote_packet[3];
             
             switch (ir_cmd) {
-                case 0x1E: // ПРИМЕР: Кнопка "Громкость +"
-                    // Если кнопку зажали - прибавляем быстрее, если клик - по 0.5 дБ
-                    if (hold_counter > 5) currentVolume += 1.0f; 
-                    else currentVolume += 0.5f;
-                    
-                    if (currentVolume > 0.0f) currentVolume = 0.0f; // Ограничение максимума
-                    
-                    Set_Volume_And_Balance(currentVolume, currentBalance);
-                    menu_need_update = 1;
-                    break;
+             case 0x1E: // Кнопка "Громкость +"
+								// Если кнопку зажали — прибавляем быстрее (например, по 4 шага), если клик — по 2 шага
+								if (hold_counter > 5) volume_val += 4;
+								else volume_val += 2;
 
-                case 0x1F: // ПРИМЕР: Кнопка "Громкость -"
-                    if (hold_counter > 5) currentVolume -= 1.0f;
-                    else currentVolume -= 0.5f;
-                    
-                    if (currentVolume < -127.5f) currentVolume = -127.5f; // Полная тишина
-                    
-                    Set_Volume_And_Balance(currentVolume, currentBalance);
-                    menu_need_update = 1;
-                    break;
-                    
-                case 0x20: // ПРИМЕР: Кнопка переключения входов
-                    if (hold_counter == 0) { // Только на одиночный клик, чтобы не прыгало!
-                        currentInput++;
-                        if (currentInput > 3) currentInput = 1;
-                        ESS9028_SetInput(currentInput);
-                        menu_need_update = 1;
-                    }
-                    break;
+								// Ограничение максимума: выше 255 байт подняться физически не может!
+								if (volume_val > 255) volume_val = 255; 
+
+								Set_Volume_And_Balance(volume_val, balance_val);
+								menu_need_update = 1;
+								break;
+
+						case 0x1F: // Кнопка "Громкость -"
+								// Если зажали — убавляем быстрее (по 4 шага), если клик — по 2 шага
+								if (hold_counter > 5) volume_val -= 4;
+								else volume_val -= 2;
+
+								// Защита снизу: если громкость ушла в ноль или попыталась улететь ниже нуля (переполниться)
+								if (volume_val > 255 || volume_val == 0) volume_val = 0; // Полная тишина
+
+								Set_Volume_And_Balance(volume_val, balance_val);
+								menu_need_update = 1;
+								break;
+
             }
         }
 
@@ -963,10 +897,10 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
         // Пример интеграции в каркас:
         /*
         if (Encoder_Get_Turn() == ENCODER_RIGHT) {
-            if (current_mode == MODE_VOLUME) {
-                currentVolume += 0.5f;
-                if (currentVolume > 0.0f) currentVolume = 0.0f;
-                Set_Volume_And_Balance(currentVolume, currentBalance);
+            if (menu_mode_val == MODE_VOLUME) {
+                volume_val += 0.5f;
+                if (volume_val > 0.0f) volume_val = 0.0f;
+                Set_Volume_And_Balance(volume_val, balance_val);
             }
             menu_need_update = 1;
         }
@@ -979,7 +913,7 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
             menu_need_update = 0;
             
             // Вызываем твою отрисовку. Внутри нее sprintf будет красиво выводить
-            // наши новые вещественные переменные типа: sprintf(buf, "Vol: %.1f dB", currentVolume);
+            // наши новые вещественные переменные типа: sprintf(buf, "Vol: %.1f dB", volume_val);
             Update_Bottom_Line(); 
         }
     }
@@ -999,7 +933,7 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
 		
 
 				
-				Set_Volume_And_Balance(currentVolume, currentBalance);			//  ОТПРАВКА НАСТРОЕК ЗВУКА В РЕГИСТРЫ ЦАП       
+				Set_Volume_And_Balance(volume_val, balance_val);			//  ОТПРАВКА НАСТРОЕК ЗВУКА В РЕГИСТРЫ ЦАП       
     }
 		
 		
