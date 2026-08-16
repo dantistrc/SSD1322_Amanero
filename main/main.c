@@ -112,6 +112,7 @@ uint8_t ir_cmd = 0;
 #define IR_CLK  RCC_APB2ENR_IOPBEN
 #define FLASH_PRESET_ADDR   0x0800FC00
 
+
 /* ============================================================
 		JSA
    ============================================================ */
@@ -150,19 +151,20 @@ volatile uint8_t button_pressed = 0;   // флаг нажатия
  *  Адрес:  #define FLASH_PRESET_ADDR   0x0800FC00.
  */
 
-typedef struct {
-    uint8_t input_select;      // 1 байт: Выбор входа
-    uint8_t digital_filter;    // 1 байт: Цифровой фильтр
-    uint8_t contrast;          // 1 байt: Яркость OLED
-    uint8_t volume_steps;      // 1 байт: Громкость в шагах (от 0 до 255)
-    uint8_t balance_steps;     // 1 байт: Баланс в шагах
-    uint8_t reserve1;          // 1 байт: Пустышка для выравнивания
-    uint8_t reserve2;          // 1 байт: Пустышка для выравнивания
-    uint8_t reserve3;          // 1 байт: Пустышка для выравнивания
-} presets_def;
-#define PRESET_WORD_CNT  sizeof(preset) / sizeof(uint32_t)
 
+    typedef struct {
+    uint8_t input_select;   // Выбор входа (1 байт)
+    uint8_t digital_filter; // Цифровой фильтр (1 байт)
+    uint8_t contrast;       // Яркость OLED (1 байт)
+    uint8_t volume_int;     // Громкость в шагах 0..255 (1 байт)
+    uint8_t balance_int;    // Баланс в шагах 0..255 (1 байт)
+    uint8_t reserve1;       // Пустышка для ровного счёта
+    uint8_t reserve2;       // Пустышка для ровного счёта
+    uint8_t reserve3;       // Пустышка для ровного счёта
+} presets_def;
 static presets_def preset;
+
+
 
 
 
@@ -785,8 +787,9 @@ int main(void) {
     currentFilter  = (uint8_t)preset.digital_filter;
     
     // Переводим обратно во float! -400 / 10.0f даст честные -40.0f
-    currentVolume  = (float)preset.volume_int / 10.0f;
-    currentBalance = (float)preset.balance_int / 10.0f;
+		currentVolume = preset.volume_int;
+		currentBalance = preset.balance_int;
+
 
 
     // ====================================================================
