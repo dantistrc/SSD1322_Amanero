@@ -111,7 +111,7 @@ uint8_t ir_cmd = 0;
 #define IR_PORT GPIOB
 #define IR_CLK  RCC_APB2ENR_IOPBEN
 #define FLASH_PRESET_ADDR   0x0800FC00
-
+#define PRESET_WORD_CNT  2
 
 /* ============================================================
 		JSA
@@ -124,7 +124,7 @@ uint8_t ir_cmd = 0;
 
 uint8_t current_mode = MODE_VOLUME; // Стартуем в режиме громкости
 uint8_t volume_val = 40;  // Стартовая громкость
-uint8_t input_val = 1;   // Стартовый вход (0-USB, 1-COA, 2-OPT)
+uint8_t input_val = 0;   // Стартовый вход (0-USB, 1-COA, 2-OPT)
 uint8_t filter_val = 0;  // Стартовый фильтр ЦАПа
 int8_t  balance_val = 0; // Стартовый баланс (ноль — центр)
 
@@ -162,7 +162,7 @@ volatile uint8_t button_pressed = 0;   // флаг нажатия
     uint8_t reserve2;       // Пустышка для ровного счёта
     uint8_t reserve3;       // Пустышка для ровного счёта
 } presets_def;
-static presets_def preset;
+	presets_def preset;
 
 
 
@@ -599,19 +599,6 @@ void ESS9028_SetInput(uint8_t input_num) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
   * @brief  Вывод информации о входе и частоте (главный экран)
   * @param  None
@@ -772,15 +759,15 @@ int main(void) {
         FLASH_ReadSettings();
     
     // ВРЕМЕННО НА ОДИН РАЗ КОММЕНТИРУЕМ IF, ЧТОБЫ ПЕРЕЗАПИСАТЬ ФОРМАТ ПАМЯТИ
-    // if (preset.input_select == 0xFF) {
+     if (preset.input_select == 0xFF) {
         preset.input_select = 1;
         preset.digital_filter = 0;
         preset.contrast = 0x8F;
-        preset.volume_int = -400; // Это наши -40.0 дБ, умноженные на 10
+        preset.volume_int = -40; // Это наши -40.0 дБ, умноженные на 10
         preset.balance_int = 0;   // Баланс 0
         
-      //  FLASH_WriteSettings();
-    // }
+        FLASH_WriteSettings();
+     }
     
     // РАСКИДЫВАЕМ ИЗ СТРУКТУРЫ ПО РАБОЧИМ ПЕРЕМЕННЫМ
     currentInput   = (uint8_t)preset.input_select;

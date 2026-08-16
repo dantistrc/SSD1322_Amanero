@@ -28,21 +28,11 @@ Project File Date:  08/16/2026
 *** Using Compiler 'V6.19', folder: 'E:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'Target 1'
 Note: source file '.\IR_REMOTE\ir_remote.c' - object file renamed from '.\Objects\ir_remote.o' to '.\Objects\ir_remote_1.o'.
-main/main.c(777): error: no member named 'volume_int' in 'presets_def'
-        preset.volume_int = -400; // <DD><F2><EE> <ED><E0><F8><E8> -40.0 <E4><C1>, <F3><EC><ED><EE><E6><E5><ED><ED><FB><E5> <ED><E0> 10
-        ~~~~~~ ^
-main/main.c(778): error: no member named 'balance_int' in 'presets_def'
-        preset.balance_int = 0;   // <C1><E0><EB><E0><ED><F1> 0
-        ~~~~~~ ^
-main/main.c(788): error: no member named 'volume_int' in 'presets_def'
-    currentVolume  = (float)preset.volume_int / 10.0f;
-                            ~~~~~~ ^
-main/main.c(789): error: no member named 'balance_int' in 'presets_def'
-    currentBalance = (float)preset.balance_int / 10.0f;
-                            ~~~~~~ ^
-4 errors generated.
 compiling main.c...
-".\Objects\SSD1322_Amanero.axf" - 4 Error(s), 0 Warning(s).
+linking...
+Program Size: Code=22112 RO-data=17236 RW-data=28 ZI-data=8364  
+FromELF: creating hex file...
+".\Objects\SSD1322_Amanero.axf" - 0 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -65,7 +55,6 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.6.0
-Target not created.
 Build Time Elapsed:  00:00:01
 </pre>
 </body>
