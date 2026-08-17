@@ -245,34 +245,69 @@ void Update_Bottom_Line(void) {
     char buf[16];
     
         switch (menu_mode_val) {
-        case 0: // MODE_VOLUME
+        //case 0: // MODE_VOLUME
             // Передаем реальную громкость из volume_val вместо статической 24
-            SSD1322_DrawString(0, 20, 1,(unsigned char*)"USB DSD 44.1");//sprintf(buf, "VOL: -%d dB ", volume_val); 
-            break;
+            //SSD1322_DrawString(0, 44, 1,(unsigned char*)"VOLUME");//sprintf(buf, "VOL: -%d dB ", volume_val); 
+            //break;
+				case 0: // MODE_VOLUME
+            // 1. Выводим префикс громкости напрямую
+						SSD1322_ClearRAM();
+            SSD1322_DrawString(0, 20, 0, (unsigned char*)"VOLUME");
             
+            // 2. Быстро разбиваем байт громкости на три символа-цифры
+            unsigned char vol_str[4];
+            vol_str[0] = (volume_val / 100) + '0';       // Сотни
+            vol_str[1] = ((volume_val % 100) / 10) + '0'; // Десятки
+            vol_str[2] = (volume_val % 10) + '0';        // Единицы
+            vol_str[3] = '\0';                           // Конец строки
+            
+            // 3. Выводим получившиеся цифры (сдвигаемся по X на 40 пикселей вправо)
+            SSD1322_DrawString(30, 20, 0, vol_str);
+            
+            // 4. Дописываем единицы измерения (сдвигаемся по X на 64 пикселя вправо)
+            SSD1322_DrawString(45, 20, 0, (unsigned char*)"dB");
+            // mini Выводим реальный вход в зависимости от input_val
+            if (input_val == 0)      SSD1322_DrawString(0, 0, 1, (unsigned char*)"USB ");
+						else if (input_val == 1) SSD1322_DrawString(0, 0, 1, (unsigned char*)"COA ");
+						else                     SSD1322_DrawString(0, 0, 1, (unsigned char*)"OPT ");
+						//  mini Выводим красивое название фильтра ESS9039
+            if (filter_val == 0)      SSD1322_DrawString(0, 45, 1, (unsigned char*)"MinPh"); // Minimum phase (default)
+            else if (filter_val == 1) SSD1322_DrawString(0, 45, 1, (unsigned char*)"LinAp"); // Linear phase apodizing fast roll-off
+            else if (filter_val == 2) SSD1322_DrawString(0, 45, 1, (unsigned char*)"LinFt"); // Linear phase fast roll-off
+            else if (filter_val == 3) SSD1322_DrawString(0, 45, 1, (unsigned char*)"LinLo"); // Linear phase fast roll-off low ripple
+            else if (filter_val == 4) SSD1322_DrawString(0, 45, 1, (unsigned char*)"LinSl"); // Linear phase slow roll-off
+            else if (filter_val == 5) SSD1322_DrawString(0, 45, 1, (unsigned char*)"MinFa"); // Minimum phase fast roll-off
+            else if (filter_val == 6) SSD1322_DrawString(0, 45, 1, (unsigned char*)"MinSl"); // Minimum phase slow roll-off
+            else                      SSD1322_DrawString(0, 45, 1, (unsigned char*)"MinLo"); // Minimum phase slow roll-off low dispersion
+						break;
+				
+				
         case 1: // MODE_INPUT
+						SSD1322_ClearRAM();
             // Выводим реальный вход в зависимости от input_val
-            if (input_val == 0)      SSD1322_DrawString(0, 44, 1, (unsigned char*)"IN: USB ");
-						else if (input_val == 1) SSD1322_DrawString(0, 44, 1, (unsigned char*)"IN: COA ");
-						else                     SSD1322_DrawString(0, 44, 1, (unsigned char*)"IN: OPT ");
+            if (input_val == 0)      SSD1322_DrawString(80, 20, 0, (unsigned char*)"USB ");
+						else if (input_val == 1) SSD1322_DrawString(80, 20, 0, (unsigned char*)"COA ");
+						else                     SSD1322_DrawString(80, 20, 0, (unsigned char*)"OPT ");
 
             break;
             
         case 2: // MODE_FILTER
-            // Выводим номер текущего фильтра ЦАПа из filter_val
-								 if (filter_val == 0) SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-1 ");
-            else if (filter_val == 1) SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-2 ");
-            else if (filter_val == 2) SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-3 ");
-            else if (filter_val == 3) SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-4 ");
-            else if (filter_val == 4) SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-5 ");
-            else if (filter_val == 5) SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-6 ");
-            else                      SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-7 ");
- 
+						SSD1322_ClearRAM();
+            // Выводим красивое название фильтра ESS9039
+            if (filter_val == 0)      SSD1322_DrawString(0, 25, 1, (unsigned char*)"1Min Phase"); // Minimum phase (default)
+            else if (filter_val == 1) SSD1322_DrawString(0, 25, 1, (unsigned char*)"2Lin Apod "); // Linear phase apodizing fast roll-off
+            else if (filter_val == 2) SSD1322_DrawString(0, 25, 1, (unsigned char*)"3Lin Fast "); // Linear phase fast roll-off
+            else if (filter_val == 3) SSD1322_DrawString(0, 25, 1, (unsigned char*)"4Lin LowR "); // Linear phase fast roll-off low ripple
+            else if (filter_val == 4) SSD1322_DrawString(0, 25, 1, (unsigned char*)"5Lin Slow "); // Linear phase slow roll-off
+            else if (filter_val == 5) SSD1322_DrawString(0, 25, 1, (unsigned char*)"6Min Fast "); // Minimum phase fast roll-off
+            else if (filter_val == 6) SSD1322_DrawString(0, 25, 1, (unsigned char*)"7Min Slow "); // Minimum phase slow roll-off
+            else                      SSD1322_DrawString(0, 25, 1, (unsigned char*)"8Min LowD "); // Minimum phase slow roll-off low dispersion
             break;
             
         case 3: // MODE_BALANCE
+						SSD1322_ClearRAM();
             // Выводим текст "BAL: " напрямую
-            SSD1322_DrawString(0, 44, 1, (unsigned char*)"BAL: ");
+            SSD1322_DrawString(0, 20, 1, (unsigned char*)"Balance");
             
             // Быстро бьем байт на сотни, десятки и единицы
             unsigned char bal_str[4];
@@ -282,7 +317,8 @@ void Update_Bottom_Line(void) {
             bal_str[3] = '\0';                             // Конец строки
             
             // Печатаем получившиеся три цифры сразу за текстом (сдвиг по X на 40 пикселей)
-            SSD1322_DrawString(40, 44, 1, bal_str);
+            SSD1322_DrawString(30, 20, 0, bal_str);
+						SSD1322_DrawString(45, 20, 0, (unsigned char*)"dB");
             break;
     }
 
@@ -489,7 +525,7 @@ void TIM2_IRQHandler(void) {
             if (menu_level) {
 //=====================================================				
  // Навигация по меню  J S A !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Заменяем старый блок навигации по уровням
+
 if (enc_direction) {
     // --- КРУТИМ ВПРАВО (ВЕЛИЧЕНИЕ) ---
     switch (menu_mode_val) {
@@ -500,7 +536,7 @@ if (enc_direction) {
             input_val = (input_val + 1) % 3; // Крутим по кругу: USB -> COA -> OPT
             break;
         case 2: // Фильтр
-            if (filter_val < 4) filter_val++; // Например, всего 5 фильтров (0..4)
+            if (filter_val < 7) filter_val++; // Например, всего 5 фильтров (0..4)
             break;
         case 3: // Баланс
             if (balance_val < 177) balance_val++;// Сдвиг в правый канал

@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\SSD1322_Amanero.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\SSD1322_Amanero.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Mon Aug 17 05:04:15 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Mon Aug 17 06:56:53 2026
 <BR><P>
 <H3>Maximum Stack Usage =        232 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -435,7 +435,7 @@ Global Symbols
 <LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FLASH_Unlock
 </UL>
 <BR>[Called By]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-<LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ProcessButtonPress
+<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ProcessButtonPress
 </UL>
 
 <P><STRONG><a name="[68]"></a>I2C2_Init</STRONG> (Thumb, 146 bytes, Stack size 0 bytes, main.o(.text))
@@ -444,25 +444,26 @@ Global Symbols
 
 <P><STRONG><a name="[b9]"></a>I2C2_WriteByte</STRONG> (Thumb, 150 bytes, Stack size 4 bytes, main.o(.text), UNUSED)
 
-<P><STRONG><a name="[4b]"></a>Update_Bottom_Line</STRONG> (Thumb, 546 bytes, Stack size 48 bytes, main.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 208<LI>Call Chain = Update_Bottom_Line &rArr; SSD1322_DrawString &rArr; SSD1322_DrawSingleAscii &rArr; SSD1322_Data_processing &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
+<P><STRONG><a name="[4b]"></a>Update_Bottom_Line</STRONG> (Thumb, 1130 bytes, Stack size 56 bytes, main.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 216<LI>Call Chain = Update_Bottom_Line &rArr; SSD1322_DrawString &rArr; SSD1322_DrawSingleAscii &rArr; SSD1322_Data_processing &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
-<BR>[Calls]<UL><LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawString
+<BR>[Calls]<UL><LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawString
+<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_ClearRAM
 </UL>
 <BR>[Called By]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[4d]"></a>Process_XMOS_Signal</STRONG> (Thumb, 422 bytes, Stack size 16 bytes, main.o(.text), UNUSED)
-<BR><BR>[Calls]<UL><LI><a href="#[4e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_XMOS_GetSignal
-<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawString
+<P><STRONG><a name="[4e]"></a>Process_XMOS_Signal</STRONG> (Thumb, 422 bytes, Stack size 16 bytes, main.o(.text), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_XMOS_GetSignal
+<LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawString
 </UL>
 
 <P><STRONG><a name="[ba]"></a>Process_Encoder_Rotation</STRONG> (Thumb, 326 bytes, Stack size 16 bytes, main.o(.text), UNUSED)
 
-<P><STRONG><a name="[4f]"></a>ProcessButtonPress</STRONG> (Thumb, 488 bytes, Stack size 24 bytes, main.o(.text))
+<P><STRONG><a name="[50]"></a>ProcessButtonPress</STRONG> (Thumb, 488 bytes, Stack size 24 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 100<LI>Call Chain = ProcessButtonPress &rArr; FLASH_WriteSettings &rArr; FLASH_ProgramWord &rArr; FLASH_WaitForLastOperation &rArr; FLASH_GetBank1Status
 </UL>
-<BR>[Calls]<UL><LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<BR>[Calls]<UL><LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
 <LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FLASH_WriteSettings
 </UL>
 <BR>[Called By]<UL><LI><a href="#[28]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM4_IRQHandler
@@ -471,46 +472,46 @@ Global Symbols
 <P><STRONG><a name="[21]"></a>EXTI9_5_IRQHandler</STRONG> (Thumb, 116 bytes, Stack size 8 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = EXTI9_5_IRQHandler &rArr; IR_Process_Bit
 </UL>
-<BR>[Calls]<UL><LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IR_Process_Bit
+<BR>[Calls]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IR_Process_Bit
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f10x_md.o(RESET)
 </UL>
 <P><STRONG><a name="[28]"></a>TIM4_IRQHandler</STRONG> (Thumb, 288 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 116<LI>Call Chain = TIM4_IRQHandler &rArr; ProcessButtonPress &rArr; FLASH_WriteSettings &rArr; FLASH_ProgramWord &rArr; FLASH_WaitForLastOperation &rArr; FLASH_GetBank1Status
 </UL>
-<BR>[Calls]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ProcessButtonPress
+<BR>[Calls]<UL><LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ProcessButtonPress
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f10x_md.o(RESET)
 </UL>
 <P><STRONG><a name="[26]"></a>TIM2_IRQHandler</STRONG> (Thumb, 758 bytes, Stack size 48 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = TIM2_IRQHandler &rArr; SSD1322_CommandWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
-<BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Master_Slave_Sel
-<LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MASTER_DAC
-<LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SD_BIT_DAC
-<LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SLOW_BIT_DAC
-<LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Encoder_direction
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<BR>[Calls]<UL><LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Master_Slave_Sel
+<LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MASTER_DAC
+<LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SD_BIT_DAC
+<LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SLOW_BIT_DAC
+<LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Encoder_direction
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f10x_md.o(RESET)
 </UL>
-<P><STRONG><a name="[58]"></a>ESS9028_WriteReg</STRONG> (Thumb, 212 bytes, Stack size 4 bytes, main.o(.text), UNUSED)
-<BR><BR>[Called By]<UL><LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESS9028_SetInput
-<LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESS9028_SetFilter
+<P><STRONG><a name="[59]"></a>ESS9028_WriteReg</STRONG> (Thumb, 212 bytes, Stack size 4 bytes, main.o(.text), UNUSED)
+<BR><BR>[Called By]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESS9028_SetInput
+<LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESS9028_SetFilter
 </UL>
 
-<P><STRONG><a name="[57]"></a>ESS9028_SetFilter</STRONG> (Thumb, 66 bytes, Stack size 16 bytes, main.o(.text), UNUSED)
-<BR><BR>[Calls]<UL><LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESS9028_WriteReg
+<P><STRONG><a name="[58]"></a>ESS9028_SetFilter</STRONG> (Thumb, 66 bytes, Stack size 16 bytes, main.o(.text), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESS9028_WriteReg
 </UL>
 
-<P><STRONG><a name="[59]"></a>ESS9028_SetInput</STRONG> (Thumb, 106 bytes, Stack size 16 bytes, main.o(.text), UNUSED)
-<BR><BR>[Calls]<UL><LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESS9028_WriteReg
+<P><STRONG><a name="[5a]"></a>ESS9028_SetInput</STRONG> (Thumb, 106 bytes, Stack size 16 bytes, main.o(.text), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESS9028_WriteReg
 </UL>
 
-<P><STRONG><a name="[5a]"></a>MUTED_LCD</STRONG> (Thumb, 60 bytes, Stack size 8 bytes, main.o(.text), UNUSED)
+<P><STRONG><a name="[5b]"></a>MUTED_LCD</STRONG> (Thumb, 60 bytes, Stack size 8 bytes, main.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delay_ms
-<LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_ClearRAM
-<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawString
+<LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawString
+<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_ClearRAM
 </UL>
 
 <P><STRONG><a name="[5d]"></a>SSD1322_DrawAleksFull</STRONG> (Thumb, 302 bytes, Stack size 24 bytes, main.o(.text))
@@ -518,8 +519,8 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DataWrite
 <LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delay_ms
-<LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_ClearRAM
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_ClearRAM
 </UL>
 <BR>[Called By]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -533,7 +534,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[40]"></a>main</STRONG> (Thumb, 392 bytes, Stack size 24 bytes, main.o(.text))
+<P><STRONG><a name="[40]"></a>main</STRONG> (Thumb, 372 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 232<LI>Call Chain = main &rArr; Update_Bottom_Line &rArr; SSD1322_DrawString &rArr; SSD1322_DrawSingleAscii &rArr; SSD1322_Data_processing &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
 <BR>[Calls]<UL><LI><a href="#[6a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Connect_DAC
@@ -545,7 +546,6 @@ Global Symbols
 <LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DWT_Init
 <LI><a href="#[5f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IR_Init
 <LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawAleksFull
-<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawString
 <LI><a href="#[4b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Update_Bottom_Line
 <LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2C2_Init
 <LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FLASH_WriteSettings
@@ -689,7 +689,7 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[79]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MUTE_State
 <LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawAleksFull
-<LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MUTED_LCD
+<LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MUTED_LCD
 </UL>
 
 <P><STRONG><a name="[64]"></a>DAC_port_Init</STRONG> (Thumb, 158 bytes, Stack size 0 bytes, dispport.o(.text))
@@ -718,7 +718,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[56]"></a>Master_Slave_Sel</STRONG> (Thumb, 34 bytes, Stack size 4 bytes, dispport.o(.text))
+<P><STRONG><a name="[57]"></a>Master_Slave_Sel</STRONG> (Thumb, 34 bytes, Stack size 4 bytes, dispport.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = Master_Slave_Sel
 </UL>
 <BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM2_IRQHandler
@@ -736,7 +736,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delay_us
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DataWrite
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
 </UL>
 
 <P><STRONG><a name="[5e]"></a>SSD1322_DataWrite</STRONG> (Thumb, 20 bytes, Stack size 16 bytes, spi_ssd1322.o(.text))
@@ -753,10 +753,10 @@ Global Symbols
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CmdDataWrite
 <LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_Init
 <LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawAleksFull
-<LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_ClearRAM
+<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_ClearRAM
 </UL>
 
-<P><STRONG><a name="[50]"></a>SSD1322_CommandWrite</STRONG> (Thumb, 42 bytes, Stack size 16 bytes, spi_ssd1322.o(.text))
+<P><STRONG><a name="[51]"></a>SSD1322_CommandWrite</STRONG> (Thumb, 42 bytes, Stack size 16 bytes, spi_ssd1322.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = SSD1322_CommandWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Spi_Write_Data
@@ -771,16 +771,16 @@ Global Symbols
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CmdDataWrite
 <LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_Init
 <LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawAleksFull
-<LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_ClearRAM
 <LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM2_IRQHandler
-<LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ProcessButtonPress
+<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ProcessButtonPress
+<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_ClearRAM
 </UL>
 
 <P><STRONG><a name="[7b]"></a>SSD1322_CmdDataWrite</STRONG> (Thumb, 32 bytes, Stack size 16 bytes, spi_ssd1322.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = SSD1322_CmdDataWrite &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DataWrite
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
 </UL>
 <BR>[Called By]<UL><LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_Init
 </UL>
@@ -800,28 +800,29 @@ Global Symbols
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CmdDataWrite
 <LI><a href="#[7d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI4W_Init
 <LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DataWrite
-<LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_ClearRAM
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_ClearRAM
 </UL>
 <BR>[Called By]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[5b]"></a>SSD1322_ClearRAM</STRONG> (Thumb, 106 bytes, Stack size 24 bytes, spi_ssd1322.o(.text))
+<P><STRONG><a name="[4c]"></a>SSD1322_ClearRAM</STRONG> (Thumb, 106 bytes, Stack size 24 bytes, spi_ssd1322.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = SSD1322_ClearRAM &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DataWrite
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
 </UL>
 <BR>[Called By]<UL><LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_Init
 <LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawAleksFull
-<LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MUTED_LCD
+<LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MUTED_LCD
+<LI><a href="#[4b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Update_Bottom_Line
 </UL>
 
 <P><STRONG><a name="[7e]"></a>SSD1322_SetRowAddress</STRONG> (Thumb, 44 bytes, Stack size 16 bytes, spi_ssd1322.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = SSD1322_SetRowAddress &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DataWrite
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gray_test
 <LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_Display_Picture
@@ -832,7 +833,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = SSD1322_SetColumnAddress &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DataWrite
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gray_test
 <LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_Display_Picture
@@ -854,25 +855,24 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_Data_processing
 <LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_SetColumnAddress
 <LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_SetRowAddress
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
 </UL>
-<BR>[Called By]<UL><LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawString
+<BR>[Called By]<UL><LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawString
 </UL>
 
-<P><STRONG><a name="[4c]"></a>SSD1322_DrawString</STRONG> (Thumb, 116 bytes, Stack size 24 bytes, spi_ssd1322.o(.text))
+<P><STRONG><a name="[4d]"></a>SSD1322_DrawString</STRONG> (Thumb, 116 bytes, Stack size 24 bytes, spi_ssd1322.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = SSD1322_DrawString &rArr; SSD1322_DrawSingleAscii &rArr; SSD1322_Data_processing &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
 <BR>[Calls]<UL><LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawSingleAscii
 </UL>
-<BR>[Called By]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-<LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MUTED_LCD
-<LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Process_XMOS_Signal
+<BR>[Called By]<UL><LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MUTED_LCD
+<LI><a href="#[4e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Process_XMOS_Signal
 <LI><a href="#[4b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Update_Bottom_Line
 </UL>
 
 <P><STRONG><a name="[82]"></a>SSD1322_DrawSmallChar</STRONG> (Thumb, 162 bytes, Stack size 16 bytes, spi_ssd1322.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DataWrite
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
 </UL>
 <BR>[Called By]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawSmallString
 </UL>
@@ -901,7 +901,7 @@ Global Symbols
 
 <P><STRONG><a name="[87]"></a>SSD1322_Update</STRONG> (Thumb, 104 bytes, Stack size 16 bytes, spi_ssd1322.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DataWrite
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
 </UL>
 <BR>[Called By]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DebugUartHex
 </UL>
@@ -912,14 +912,14 @@ Global Symbols
 <BR><BR>[Calls]<UL><LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_Data_processing
 <LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_SetColumnAddress
 <LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_SetRowAddress
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
 </UL>
 
 <P><STRONG><a name="[89]"></a>Gray_test</STRONG> (Thumb, 230 bytes, Stack size 40 bytes, spi_ssd1322.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_SetColumnAddress
 <LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_SetRowAddress
 <LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DataWrite
-<LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_CommandWrite
 </UL>
 
 <P><STRONG><a name="[8a]"></a>DebugUartHex</STRONG> (Thumb, 114 bytes, Stack size 40 bytes, spi_ssd1322.o(.text), UNUSED)
@@ -948,7 +948,7 @@ Global Symbols
 
 <P><STRONG><a name="[d0]"></a>Encoder_read</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, encoder.o(.text), UNUSED)
 
-<P><STRONG><a name="[52]"></a>Encoder_direction</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, encoder.o(.text))
+<P><STRONG><a name="[53]"></a>Encoder_direction</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, encoder.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM2_IRQHandler
 </UL>
 
@@ -956,7 +956,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[55]"></a>MASTER_DAC</STRONG> (Thumb, 30 bytes, Stack size 4 bytes, controlport.o(.text))
+<P><STRONG><a name="[56]"></a>MASTER_DAC</STRONG> (Thumb, 30 bytes, Stack size 4 bytes, controlport.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = MASTER_DAC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM2_IRQHandler
@@ -966,13 +966,13 @@ Global Symbols
 
 <P><STRONG><a name="[d2]"></a>MCLK_DAC</STRONG> (Thumb, 30 bytes, Stack size 4 bytes, controlport.o(.text), UNUSED)
 
-<P><STRONG><a name="[53]"></a>SLOW_BIT_DAC</STRONG> (Thumb, 30 bytes, Stack size 4 bytes, controlport.o(.text))
+<P><STRONG><a name="[54]"></a>SLOW_BIT_DAC</STRONG> (Thumb, 30 bytes, Stack size 4 bytes, controlport.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = SLOW_BIT_DAC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM2_IRQHandler
 </UL>
 
-<P><STRONG><a name="[54]"></a>SD_BIT_DAC</STRONG> (Thumb, 30 bytes, Stack size 4 bytes, controlport.o(.text))
+<P><STRONG><a name="[55]"></a>SD_BIT_DAC</STRONG> (Thumb, 30 bytes, Stack size 4 bytes, controlport.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = SD_BIT_DAC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM2_IRQHandler
@@ -989,8 +989,8 @@ Global Symbols
 
 <P><STRONG><a name="[d3]"></a>UART_ReadByte</STRONG> (Thumb, 60 bytes, Stack size 8 bytes, uart_xmos.o(.text), UNUSED)
 
-<P><STRONG><a name="[4e]"></a>UART_XMOS_GetSignal</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, uart_xmos.o(.text), UNUSED)
-<BR><BR>[Called By]<UL><LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Process_XMOS_Signal
+<P><STRONG><a name="[4f]"></a>UART_XMOS_GetSignal</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, uart_xmos.o(.text), UNUSED)
+<BR><BR>[Called By]<UL><LI><a href="#[4e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Process_XMOS_Signal
 </UL>
 
 <P><STRONG><a name="[2f]"></a>USART1_IRQHandler</STRONG> (Thumb, 122 bytes, Stack size 4 bytes, uart_xmos.o(.text))
@@ -998,7 +998,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f10x_md.o(RESET)
 </UL>
-<P><STRONG><a name="[51]"></a>IR_Process_Bit</STRONG> (Thumb, 418 bytes, Stack size 8 bytes, ir_remote_1.o(.text))
+<P><STRONG><a name="[52]"></a>IR_Process_Bit</STRONG> (Thumb, 418 bytes, Stack size 8 bytes, ir_remote_1.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = IR_Process_Bit
 </UL>
 <BR>[Called By]<UL><LI><a href="#[21]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI9_5_IRQHandler
