@@ -755,7 +755,45 @@ void MUTED_LCD(void) {
   */
 
 // =====================================================================================================================================================================
-//   УМНАЯ ФУНКЦИЯ ОТРИСОВКИ ДЛЯ ПЯТИ БУКВ СЛОВА "ALEKS"
+// 
+void Process_IR_Command(uint32_t ir_code) {
+    switch (buffer[2]) {
+        case 0x0B: // VOLUME++
+            if (volume_val < 255) volume_val++;
+            menu_need_update = 1; // Взводим наш родной флаг экрана!
+            break;
+        case 0x0D: // VOLUME--
+            if (volume_val > 0) volume_val--;
+            menu_need_update = 1;
+            break;
+         case 0x5D: // MUTE
+            menu_mode_val++;
+            if (menu_mode_val > 3) menu_mode_val = 0;
+            menu_need_update = 1;
+            break;
+        case 0x07: // BALANCE>R
+            menu_mode_val++;
+            if (balance_val < 177) balance_val++;// Сдвиг в правый канал
+            menu_need_update = 1;
+            break;
+				case 0x08: // BALANCE<L
+            menu_mode_val++;
+            if (balance_val > 77) balance_val--;// Сдвиг в левый канал
+            menu_need_update = 1;
+            break;
+				case 0x02: // MENU 
+            menu_mode_val++;
+            if (menu_mode_val > 3) menu_mode_val = 0;
+            menu_need_update = 1;
+            break;
+				case 0x5E: // FILTRE++
+            menu_mode_val++;
+            if (menu_mode_val > 3) menu_mode_val = 0;
+            menu_need_update = 1;
+            break;
+
+    }
+}  
 //
 
 // ============================================================
@@ -938,136 +976,7 @@ SSD1322_DrawString(0, 0, 1,(unsigned char*)"USB PCM 768 ");
         menu_need_update = 0; // Сбрасываем флаг
         Update_Bottom_Line(); // Спокойно и не спеша шлём данные в SPI в фоне!
 
-        //ProcessButtonPress();
-/*				 // ====================================================================
-        // ОБРАБОТКА ВРАЩЕНИЯ ЭНКОДЕРА С УЧЁТОМ РЕЖИМА МЕНЮ
-        // ====================================================================
-        if (TIM3->CNT > last_encoder_value) {
-            // ---- Крутанули ВПРАВО ----
-            switch (menu_mode_val) {
-                case 0: // Режим Громкости
-                    if (volume_val < 255) volume_val++;
-                    break;
-                case 1: // Режим Входа
-                    if (input_val < 2) input_val++; // Всего 3 входа: 0, 1, 2
-                    break;
-                case 2: // Режим Фильтра
-                    if (filter_val < 7) filter_val++; // Например, 8 фильтров ЦАПа
-                    break;
-                case 3: // Режим Баланса
-                    if (balance_val < 147) balance_val++;
-                    break;
-            }
-            
-            // Заглушенная отправка в ЦАП (пока не трогаем, ждём I2C)
-            // Set_Volume_And_Balance(volume_val, balance_val); 
-            
-            menu_need_update = 1; // Взводим флаг отрисовки экрана
-            last_encoder_value = TIM3->CNT;
-        }
-        else if (TIM3->CNT < last_encoder_value) {
-            // ---- Крутанули ВЛЕВО ----
-            switch (menu_mode_val) {
-                case 0: // Режим Громкости
-                    if (volume_val > 0) volume_val--;
-                    break;
-                case 1: // Режим Входа
-                    if (input_val > 0) input_val--;
-                    break;
-                case 2: // Режим Фильтра
-                    if (filter_val > 0) filter_val--;
-                    break;
-                case 3: // Режим Баланса
-                    if (balance_val > 0) balance_val--;
-                    break;
-            }
-            
-            // Заглушенная отправка в ЦАП (пока не трогаем, ждём I2C)
-            // Set_Volume_And_Balance(volume_val, balance_val); 
-            
-            menu_need_update = 1; // Взводим флаг отрисовки экрана
-            last_encoder_value = TIM3->CNT;
-        }
-
-					
-			
-*/
-/*					// ====================================================================
-        // 1. АППАРАТНЫЙ ТАЙМАУТ ОТПУСКАНИЯ КНОПКИ ПУЛЬТА (0.2 сек = 2000 тиков)
-        // ====================================================================
-        uint16_t current_tick = TIM4->CNT;
-        uint16_t ir_diff = (current_tick >= ir_last_tick) ? (current_tick - ir_last_tick) : (current_tick + 10000 - ir_last_tick);
-
-        if (ir_diff > 2000) {
-            if (hold_counter > 0) {
-                hold_counter = 0; // Кнопку точно отпустили!
-            }
-        }
-*/
-/*        // ====================================================================
-        // 2. ОБРАБОТКА ИК-ПУЛЬТА (Привязка к кнопкам и плавному удержанию)
-        // ====================================================================
-        if (IR_GetPacket(remote_packet)) {
-                ir_cmd = remote_packet[2]; // Достаем 3-й байт команды из прилетевшего пакета!
-
-            // Если прилетел пакет (или удерживается старый) - вычисляем действие
-            // В Watch-окне Keil мы ловим 3-й байт команды: remote_packet[3]
-           // uint8_t ir_cmd = remote_packet[3];
-            
-            switch (ir_cmd) {
-             case 0x1E: // Кнопка "Громкость +"
-								// Если кнопку зажали — прибавляем быстрее (например, по 4 шага), если клик — по 2 шага
-								if (hold_counter > 5) volume_val += 4;
-								else volume_val += 2;
-
-								// Ограничение максимума: выше 255 байт подняться физически не может!
-								if (volume_val > 255) volume_val = 255; 
-
-								Set_Volume_And_Balance(volume_val, balance_val);
-								menu_need_update = 1;
-								break;
-
-						case 0x1F: // Кнопка "Громкость -"
-								// Если зажали — убавляем быстрее (по 4 шага), если клик — по 2 шага
-								if (hold_counter > 5) volume_val -= 4;
-								else volume_val -= 2;
-
-								// Защита снизу: если громкость ушла в ноль или попыталась улететь ниже нуля (переполниться)
-								if (volume_val > 255 || volume_val == 0) volume_val = 0; // Полная тишина
-
-								Set_Volume_And_Balance(volume_val, balance_val);
-								menu_need_update = 1;
-								break;
-
-            }
-        }
-*/
-/*        // ====================================================================
-        // 3. ОБРАБОТКА ФИЗИЧЕСКИХ ЭНКОДЕРОВ (Ручное управление)
-        // ====================================================================
-        // Твой готовый код антидребезга и опроса фаз А и В
-        // Пример интеграции в каркас:
         
-        if (Encoder_Get_Turn() == ENCODER_RIGHT) {
-            if (menu_mode_val == MODE_VOLUME) {
-                volume_val += 0.5f;
-                if (volume_val > 0.0f) volume_val = 0.0f;
-                Set_Volume_And_Balance(volume_val, balance_val);
-            }
-            menu_need_update = 1;
-        }
-        
-
-        // ====================================================================
-        // 4. ОБНОВЛЕНИЕ СТРОКИ OLED-ДИСПЛЕЯ ПО ФЛАГУ
-        // ====================================================================
-        if (menu_need_update) {
-            menu_need_update = 0;
-            
-            // Вызываем твою отрисовку. Внутри нее sprintf будет красиво выводить
-            // наши новые вещественные переменные типа: sprintf(buf, "Vol: %.1f dB", volume_val);
-            Update_Bottom_Line(); 
-        }*/
     }
 	
 /*/ ============================================================
