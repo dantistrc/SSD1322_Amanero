@@ -18,7 +18,7 @@ volatile uint8_t  ir_state = IR_STATE_IDLE;
 volatile uint8_t  ir_bit_count = 0;
 volatile uint32_t ir_current_packet = 0; // Сюда собираем все 32 бита
 volatile uint8_t  ir_packet_ready = 0;
-extern volatile uint8_t  ir_rx_buffer[4];       // Буфер под все 4 байта пульта
+volatile uint8_t  ir_rx_buffer[4];       // Буфер под все 4 байта пульта
 volatile uint16_t hold_counter = 0; // Глобальный счётчик удержания пульта
 extern volatile uint16_t ir_last_tick;
 // ============================================================

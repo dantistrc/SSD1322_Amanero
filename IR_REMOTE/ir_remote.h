@@ -20,8 +20,8 @@ extern volatile uint32_t ir_durations[MAX_DURATIONS];
 extern volatile uint8_t  ir_duration_index;
 extern volatile uint8_t  ir_packet_ready;
 extern volatile uint16_t hold_counter;
-
-
+extern volatile uint8_t ir_rx_buffer[];       // Буфер под все 4 байта пульта
+extern volatile uint8_t ir_state;
 
 #define IR_KEY_POWER           0x61A2
 #define IR_KEY_VOLUMEUP        0x40A2

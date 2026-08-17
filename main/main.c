@@ -22,6 +22,8 @@
 //#include "font_small.h"
 extern const unsigned char SmallFont[][6];
 extern volatile uint8_t rx_buffer[];      // Наш массив из UART_XMOS.c
+//extern volatile uint8_t ir_rx_buffer[];		// IR Массив
+
 extern volatile uint32_t ir_durations[];
 extern volatile uint8_t  ir_duration_index;
 extern volatile uint8_t  ir_packet_ready;
@@ -265,10 +267,10 @@ void Update_Bottom_Line(void) {
             
             // 2. Быстро разбиваем байт громкости на три символа-цифры
             unsigned char vol_str[4];
-            /*vol_str[0] = (volume_val / 100) + '0';       // Сотни
-            vol_str[1] = ((volume_val % 100) / 10) + '0'; // Десятки
-            vol_str[2] = (volume_val % 10) + '0';        // Единицы
-            vol_str[3] = '\0';                           // Конец строки*/
+            //vol_str[0] = (volume_val / 100) + '0';       // Сотни
+            //vol_str[1] = ((volume_val % 100) / 10) + '0'; // Десятки
+            //vol_str[2] = (volume_val % 10) + '0';        // Единицы
+            //vol_str[3] = '\0';                           // Конец строки
 						// Сотни: если сотен нет, пишем пробел, иначе — цифру
 						if (volume_val / 100 == 0) {
 								vol_str[0] = ' ';
@@ -485,9 +487,7 @@ if (is_long) {
         menu_mode_val = 0; // Наша громкость MODE_VOLUME
     }
    menu_need_update = 1; // Просто машем флажком, это занимает 1 такт процессора
-// Update_Bottom_Line();																					//rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrIRrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
 		}
-
 }
 //=============================================M U T E======================================================
 void Set_DAC_Mute(uint8_t state)
@@ -771,43 +771,56 @@ void MUTED_LCD(void) {
   */
 
 // =================IR-REMOTE====================================================================================================================================================
-// 
+//-------------------------------------------
+//-------------------0X0B--------------------
+//-------------------------------------------
+//-------------------------------------------
+//-------------------------------------------
+//-----0X08----------0X5D-----------0X07-----
+//-------------------------------------------
+//-------------------------------------------
+//-------------------------------------------
+//-------------------0X0D--------------------
+//-------------------------------------------
+//-------------------------------------------
+//-------------------------------------------
+//-----0X02-------------------------0X5E-----
+//-------------------------------------------
+
 void Process_IR_Command(uint32_t ir_code) {
-    switch (buffer[2]) {
+    switch (ir_code) {
         case 0x0B: // VOLUME++
-            if (volume_val < 255) volume_val++;
+            if (volume_val < 254) volume_val = volume_val + 2 ;
             menu_need_update = 1; // Взводим наш родной флаг экрана!
             break;
         case 0x0D: // VOLUME--
-            if (volume_val > 0) volume_val--;
+            if (volume_val > 0) volume_val = volume_val - 2;
             menu_need_update = 1;
             break;
          case 0x5D: // MUTE
             mute_flag = !mute_flag; // Переключаем флаг при каждом нажатии (0 превратится в 1, а 1 в 0)
-						Set_DAC_Mute(mute_flag); // Дергаем нашу новую функцию
+						Set_DAC_Mute(mute_flag); // Дергаем нашу новую функцию --------MUTE--------- + DISP
             menu_need_update = 1;
             break;
         case 0x07: // BALANCE>R
-            menu_mode_val++;
             if (balance_val < 177) balance_val++;// Сдвиг в правый канал
             menu_need_update = 1;
             break;
 				case 0x08: // BALANCE<L
-            menu_mode_val++;
             if (balance_val > 77) balance_val--;// Сдвиг в левый канал
             menu_need_update = 1;
+						//Сюда вставить флаг, отобразить "баланс"  +1 сек
             break;
-				case 0x02: // MENU 
-            menu_mode_val++;
-            if (menu_mode_val > 3) menu_mode_val = 0;
+				case 0x02: // INPUT 
+            input_val = (input_val + 1) % 3; // Крутим по кругу: USB -> COA -> OPT
             menu_need_update = 1;
             break;
 				case 0x5E: // FILTRE++
 						filter_val = (filter_val + 1) % 8; // Крутим по кругу: USB -> COA -> OPT
             menu_need_update = 1;
             break;
-
     }
+						ir_packet_ready = 0;
 }  
 //
     
@@ -1007,11 +1020,10 @@ SSD1322_DrawString(0, 0, 1,(unsigned char*)"USB PCM 768 ");
 				if (menu_need_update) {
         menu_need_update = 0; // Сбрасываем флаг
         Update_Bottom_Line(); // Спокойно и не спеша шлём данные в SPI в фоне!
+				}	
 				if (ir_packet_ready) {
-						 Process_IR_Command(ir_rx_buffer[2]);
-					}
-        
-    }
+						 Process_IR_Command(ir_rx_buffer[2]);      
+				}
 	
 /*/ ============================================================
 
