@@ -116,7 +116,7 @@ uint8_t menu_mode_val = 0; // Стартуем в режиме громкости
 uint8_t volume_val = 40;  // Стартовая громкость
 uint8_t input_val = 0;   // Стартовый вход (0-USB, 1-COA, 2-OPT)
 uint8_t filter_val = 0;  // Стартовый фильтр ЦАПа
-int8_t  balance_val = 0; // Стартовый баланс (ноль — центр)
+uint8_t  balance_val = 0; // Стартовый баланс (ноль — центр)
 /* ============================================================
    3.  ВСПОМОГАТЕЛЬНЫЕ БУФЕРЫ
    ============================================================ */
@@ -260,21 +260,64 @@ void Update_Bottom_Line(void) {
             
         case 2: // MODE_FILTER
             // Выводим номер текущего фильтра ЦАПа из filter_val
-            sprintf(buf, "FLT: F-%d     ", filter_val); 
+								 if (filter_val == 0) SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-1 ");
+            else if (filter_val == 1) SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-2 ");
+            else if (filter_val == 2) SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-3 ");
+            else if (filter_val == 3) SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-4 ");
+            else if (filter_val == 4) SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-5 ");
+            else if (filter_val == 5) SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-6 ");
+            else                      SSD1322_DrawString(0, 44, 1, (unsigned char*)"FLT: F-7 ");
+ 
             break;
             
         case 3: // MODE_BALANCE
-            // Выводим баланс из balance_val
-            sprintf(buf, "BAL: %d      ", balance_val); 
+            // Выводим текст "BAL: " напрямую
+            SSD1322_DrawString(0, 44, 1, (unsigned char*)"BAL: ");
+            
+            // Быстро бьем байт на сотни, десятки и единицы
+            unsigned char bal_str[4];
+            bal_str[0] = (balance_val / 100) + '0';       // Сотни
+            bal_str[1] = ((balance_val % 100) / 10) + '0'; // Десятки
+            bal_str[2] = (balance_val % 10) + '0';        // Единицы
+            bal_str[3] = '\0';                             // Конец строки
+            
+            // Печатаем получившиеся три цифры сразу за текстом (сдвиг по X на 40 пикселей)
+            SSD1322_DrawString(40, 44, 1, bal_str);
             break;
     }
 
     
     // Выстреливаем собранную строку на координату Y = 44
     // Передаем аргумент '1', чтобы включить наш новый мелкий шрифт 16х11
-    SSD1322_DrawString(0, 44, 1, (unsigned char*)buf);
-		SSD1322_Update(0x00, 0x1F);
+    //SSD1322_DrawString(0, 44, 1, (unsigned char*)buf);
+		//SSD1322_Update(0x00, 0x1F);
 }
+
+//==========================UART-DISPLAY=========================================================================
+void Process_XMOS_Signal(void) {												// ----- ОБРАБОТКА СИГНАЛА ОТ XMOS-XU316 pin12 -----
+         uint8_t signal = UART_XMOS_GetSignal();
+        if (signal != 0) {
+            switch (signal) {
+                case 0x01: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM   44.1kHz"); break;
+                case 0x02: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM     48kHz"); break;
+                case 0x03: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM   88.2kHz"); break;
+                case 0x04: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM     96kHz"); break;
+                case 0x05: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM  176.4kHz"); break;
+                case 0x06: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM    192kHz"); break;
+                case 0x07: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM  352.8kHz"); break;
+                case 0x08: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM    384kHz"); break;
+                case 0x09: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM  705.6kHz"); break;
+                case 0x0A: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM    768kHz"); break;
+                case 0x0B: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM  1411.2kHz"); break;
+                case 0x0C: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM    1536kHz"); break;
+                case 0x19: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD64   2.822"); break;
+                case 0x1A: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD128  5.644"); break;
+                case 0x1B: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD256 11.289"); break;
+                case 0x1C: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD512 22.579"); break;
+                case 0x1D: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD1024 45.15"); break;
+            }
+        }
+		}
 //======================== J S A ENCODER ========================================================================
 void Process_Encoder_Rotation(uint8_t direction) {
     // Локальные переменные, которые мы завели в меню:
@@ -357,7 +400,8 @@ if (is_long) {
 //*************************************************************************************************
     while ((GPIOA->IDR & (1 << 6)) == 0) { __NOP(); }
 }
-else {
+    else if (is_long == 0) { // Защита от дребезга (diff > 50 тиков), но не длинный пресс!
+
     // ВАРИАНТ 1: КОРОТКИЙ КЛИК
 		menu_level = 1; // Активируем меню, чтобы TIM2 пустил нас к крутилке!
     menu_mode_val++;
@@ -450,7 +494,7 @@ if (enc_direction) {
     // --- КРУТИМ ВПРАВО (ВЕЛИЧЕНИЕ) ---
     switch (menu_mode_val) {
         case 0: // Громкость
-            if (volume_val < 100) volume_val++;
+            if (volume_val < 255) volume_val++;
             break;
         case 1: // Вход
             input_val = (input_val + 1) % 3; // Крутим по кругу: USB -> COA -> OPT
@@ -459,7 +503,7 @@ if (enc_direction) {
             if (filter_val < 4) filter_val++; // Например, всего 5 фильтров (0..4)
             break;
         case 3: // Баланс
-            if (balance_val < 10) balance_val++; // Сдвиг в правый канал
+            if (balance_val < 177) balance_val++;// Сдвиг в правый канал
             break;
     }
 } else {
@@ -475,14 +519,11 @@ if (enc_direction) {
             if (filter_val > 0) filter_val--;
             break;
         case 3: // Баланс
-            if (balance_val > -10) balance_val--; // Сдвиг в левый канал
+            if (balance_val > 77) balance_val--;// Сдвиг в левый канал
             break;
     }
 }
-
-// Мгновенно обновляем нижнюю строчку экрана с новыми значениями!
-menu_need_update = 1; // Просто машем флажком, это занимает 1 такт процессора
-//Update_Bottom_Line();																					//rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrIRrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+menu_need_update = 1; // Устанавливаем флажок обновление Дисплея запустится через While(1)
 //=========================== J S A ++++++++++++++++++++++++++++++++++++================================
             } else {
                 // Главный экран — переключение фильтров или входа
@@ -585,8 +626,8 @@ void ESS9028_SetInput(uint8_t input_num) {
 }
 
 
- // */=================================Громкость баланс===========================================
-void Set_Volume_And_Balance(uint8_t volume_val, uint8_t balance_val) {
+  // */=================================Громкость баланс===========================================
+/*void Set_Volume_And_Balance(uint8_t volume_val, uint8_t balance_val) {
     // 1. ПЕРЕВОДИМ НАШУ ГРОМКОСТЬ В БАЗОВЫЕ БАЙТЫ ЦАПА (РАЗВОРАЧИВАЕМ ШКАЛУ)
     int16_t calcLeft  = 255 - volume_val;
     int16_t calcRight = 255 - volume_val;
@@ -613,7 +654,7 @@ void Set_Volume_And_Balance(uint8_t volume_val, uint8_t balance_val) {
     // 4. ОТПРАВЛЯЕМ В РЕГИСТРЫ ЦАПА ПО I2C
     //ESS9028_WriteReg(ESS9028_I2C_ADDR, 15, regLeft);  // Левый канал
     //ESS9028_WriteReg(ESS9028_I2C_ADDR, 16, regRight); // Правый канал
-}
+}*/
 
 /**
   * @brief  Вывод информации о входе и частоте (главный экран)
@@ -809,7 +850,7 @@ SSD1322_DrawString(0, 0, 1,(unsigned char*)"USB PCM 768 ");
 
 SSD1322_DrawAleksFull(35, 20, 1000);/// Пример вызова: X=30 (байт), Y=20 (строка)
 
-SSD1322_DrawString(0, 0, 0,(unsigned char*)"USB DSD 44.1");
+//SSD1322_DrawString(0, 0, 0,(unsigned char*)"USB DSD 44.1");
 // ============================================================
 
 uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
@@ -820,8 +861,8 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
         menu_need_update = 0; // Сбрасываем флаг
         Update_Bottom_Line(); // Спокойно и не спеша шлём данные в SPI в фоне!
 
-        ProcessButtonPress();
-				 // ====================================================================
+        //ProcessButtonPress();
+/*				 // ====================================================================
         // ОБРАБОТКА ВРАЩЕНИЯ ЭНКОДЕРА С УЧЁТОМ РЕЖИМА МЕНЮ
         // ====================================================================
         if (TIM3->CNT > last_encoder_value) {
@@ -872,27 +913,9 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
         }
 
 					
-			/*		// ====================================================================
-        // ОБРАБОТКА ЭНКОДЕРА ГРОМКОСТИ ПРЯМЫМ ХОДОМ
-        // ====================================================================
-        if (TIM3->CNT > last_encoder_value) {
-            // Крутанули ВПРАВО — прибавляем звук на 0.5 дБ
-            volume_val += 1;
-            if (volume_val > 255) volume_val = 255; // Наш честный максимум байта
-            Set_Volume_And_Balance(volume_val, balance_val); // Пуляем в ЦАП!
-            menu_need_update = 1; // Флаг на отрисовку экрана
-            last_encoder_value = TIM3->CNT;
-        }
-        else if (TIM3->CNT < last_encoder_value) {
-            // Крутанули ВЛЕВО — убавляем звук на 0.5 дБ
-            volume_val -= 1;
-            if (volume_val == 0 || volume_val > 255) volume_val = 0; // Безопасный стоп на полной тишине   
-            Set_Volume_And_Balance(volume_val, balance_val); // Пуляем в ЦАП!
-            menu_need_update = 1;
-            last_encoder_value = TIM3->CNT;
-        }*/
-
-					// ====================================================================
+			
+*/
+/*					// ====================================================================
         // 1. АППАРАТНЫЙ ТАЙМАУТ ОТПУСКАНИЯ КНОПКИ ПУЛЬТА (0.2 сек = 2000 тиков)
         // ====================================================================
         uint16_t current_tick = TIM4->CNT;
@@ -903,8 +926,8 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
                 hold_counter = 0; // Кнопку точно отпустили!
             }
         }
-
-        // ====================================================================
+*/
+/*        // ====================================================================
         // 2. ОБРАБОТКА ИК-ПУЛЬТА (Привязка к кнопкам и плавному удержанию)
         // ====================================================================
         if (IR_GetPacket(remote_packet)) {
@@ -941,13 +964,13 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
 
             }
         }
-
-        // ====================================================================
+*/
+/*        // ====================================================================
         // 3. ОБРАБОТКА ФИЗИЧЕСКИХ ЭНКОДЕРОВ (Ручное управление)
         // ====================================================================
         // Твой готовый код антидребезга и опроса фаз А и В
         // Пример интеграции в каркас:
-        /*
+        
         if (Encoder_Get_Turn() == ENCODER_RIGHT) {
             if (menu_mode_val == MODE_VOLUME) {
                 volume_val += 0.5f;
@@ -956,7 +979,7 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
             }
             menu_need_update = 1;
         }
-        */
+        
 
         // ====================================================================
         // 4. ОБНОВЛЕНИЕ СТРОКИ OLED-ДИСПЛЕЯ ПО ФЛАГУ
@@ -967,10 +990,10 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
             // Вызываем твою отрисовку. Внутри нее sprintf будет красиво выводить
             // наши новые вещественные переменные типа: sprintf(buf, "Vol: %.1f dB", volume_val);
             Update_Bottom_Line(); 
-        }
+        }*/
     }
-
-// ============================================================
+	
+/*/ ============================================================
 
 
 		// АППАРАТНЫЙ ТАЙМАУТ ПУЛЬТА 0.2 СЕКУНДЫ (2000 ТИКОВ)
@@ -988,29 +1011,6 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
 				Set_Volume_And_Balance(volume_val, balance_val);			//  ОТПРАВКА НАСТРОЕК ЗВУКА В РЕГИСТРЫ ЦАП       
     }
 		
-		
+		*/
+	}
 }
-void Process_XMOS_Signal(void) {												// ----- ОБРАБОТКА СИГНАЛА ОТ XMOS-XU316 pin12 -----
-         uint8_t signal = UART_XMOS_GetSignal();
-        if (signal != 0) {
-            switch (signal) {
-                case 0x01: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM   44.1kHz"); break;
-                case 0x02: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM     48kHz"); break;
-                case 0x03: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM   88.2kHz"); break;
-                case 0x04: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM     96kHz"); break;
-                case 0x05: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM  176.4kHz"); break;
-                case 0x06: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM    192kHz"); break;
-                case 0x07: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM  352.8kHz"); break;
-                case 0x08: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM    384kHz"); break;
-                case 0x09: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM  705.6kHz"); break;
-                case 0x0A: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM    768kHz"); break;
-                case 0x0B: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM  1411.2kHz"); break;
-                case 0x0C: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM    1536kHz"); break;
-                case 0x19: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD64   2.822"); break;
-                case 0x1A: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD128  5.644"); break;
-                case 0x1B: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD256 11.289"); break;
-                case 0x1C: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD512 22.579"); break;
-                case 0x1D: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD1024 45.15"); break;
-            }
-        }
-		}
