@@ -243,7 +243,15 @@ void I2C2_WriteByte(uint8_t addr, uint8_t data) {
    ============================================================ */
 void Update_Bottom_Line(void) {
     char buf[16];
+						    // Локальный черновик: помнит, какой экран мы рисовали прошлым
+					static uint8_t last_mode = 255; 
     
+					// Если режим изменился — только тогда чистим экран один раз!
+					if (menu_mode_val != last_mode) {
+					SSD1322_ClearRAM();
+					last_mode = menu_mode_val; // Запоминаем новый режим
+					}
+
         switch (menu_mode_val) {
         //case 0: // MODE_VOLUME
             // Передаем реальную громкость из volume_val вместо статической 24
@@ -251,15 +259,32 @@ void Update_Bottom_Line(void) {
             //break;
 				case 0: // MODE_VOLUME
             // 1. Выводим префикс громкости напрямую
-						SSD1322_ClearRAM();
-            SSD1322_DrawString(0, 20, 0, (unsigned char*)"VOLUME");
+						//SSD1322_ClearRAM();
+            SSD1322_DrawString(0, 20, 0, (unsigned char*)"Volume");
             
             // 2. Быстро разбиваем байт громкости на три символа-цифры
             unsigned char vol_str[4];
-            vol_str[0] = (volume_val / 100) + '0';       // Сотни
+            /*vol_str[0] = (volume_val / 100) + '0';       // Сотни
             vol_str[1] = ((volume_val % 100) / 10) + '0'; // Десятки
             vol_str[2] = (volume_val % 10) + '0';        // Единицы
-            vol_str[3] = '\0';                           // Конец строки
+            vol_str[3] = '\0';                           // Конец строки*/
+						// Сотни: если сотен нет, пишем пробел, иначе — цифру
+						if (volume_val / 100 == 0) {
+								vol_str[0] = ' ';
+						} else {
+								vol_str[0] = (volume_val / 100) + '0';
+						}
+
+						// Десятки: если сотен нет И десятков нет — пишем пробел, иначе — цифру
+						if ((volume_val / 100 == 0) && (((volume_val % 100) / 10) == 0)) {
+								vol_str[1] = ' ';
+						} else {
+								vol_str[1] = ((volume_val % 100) / 10) + '0';
+						}
+
+						// Единицы выводим всегда, даже если это чистый ноль
+						vol_str[2] = (volume_val % 10) + '0';
+						vol_str[3] = '\0'; // Конец строки
             
             // 3. Выводим получившиеся цифры (сдвигаемся по X на 40 пикселей вправо)
             SSD1322_DrawString(30, 20, 0, vol_str);
@@ -283,7 +308,7 @@ void Update_Bottom_Line(void) {
 				
 				
         case 1: // MODE_INPUT
-						SSD1322_ClearRAM();
+						//SSD1322_ClearRAM();
             // Выводим реальный вход в зависимости от input_val
             if (input_val == 0)      SSD1322_DrawString(80, 20, 0, (unsigned char*)"USB ");
 						else if (input_val == 1) SSD1322_DrawString(80, 20, 0, (unsigned char*)"COA ");
@@ -292,7 +317,7 @@ void Update_Bottom_Line(void) {
             break;
             
         case 2: // MODE_FILTER
-						SSD1322_ClearRAM();
+						//SSD1322_ClearRAM();
             // Выводим красивое название фильтра ESS9039
             if (filter_val == 0)      SSD1322_DrawString(0, 25, 1, (unsigned char*)"1Min Phase"); // Minimum phase (default)
             else if (filter_val == 1) SSD1322_DrawString(0, 25, 1, (unsigned char*)"2Lin Apod "); // Linear phase apodizing fast roll-off
@@ -305,20 +330,34 @@ void Update_Bottom_Line(void) {
             break;
             
         case 3: // MODE_BALANCE
-						SSD1322_ClearRAM();
+						//SSD1322_ClearRAM();
             // Выводим текст "BAL: " напрямую
-            SSD1322_DrawString(0, 20, 1, (unsigned char*)"Balance");
+            SSD1322_DrawString(0, 20, 0, (unsigned char*)"Balance");
             
             // Быстро бьем байт на сотни, десятки и единицы
             unsigned char bal_str[4];
-            bal_str[0] = (balance_val / 100) + '0';       // Сотни
-            bal_str[1] = ((balance_val % 100) / 10) + '0'; // Десятки
-            bal_str[2] = (balance_val % 10) + '0';        // Единицы
-            bal_str[3] = '\0';                             // Конец строки
+                    // Сотни: если сотен нет, пишем пробел, иначе — цифру
+						if (balance_val / 100 == 0) {
+								bal_str[0] = ' ';
+						} else {
+								bal_str[0] = (balance_val / 100) + '0';
+						}
+
+						// Десятки: если сотен нет И десятков нет — пишем пробел, иначе — цифру
+						if ((balance_val / 100 == 0) && (((balance_val % 100) / 10) == 0)) {
+								bal_str[1] = ' ';
+						} else {
+								bal_str[1] = ((balance_val % 100) / 10) + '0';
+						}
+
+						// Единицы выводим всегда, даже если это чистый ноль
+						bal_str[2] = (balance_val % 10) + '0';
+						bal_str[3] = '\0'; // Конец строки
+
             
             // Печатаем получившиеся три цифры сразу за текстом (сдвиг по X на 40 пикселей)
-            SSD1322_DrawString(30, 20, 0, bal_str);
-						SSD1322_DrawString(45, 20, 0, (unsigned char*)"dB");
+            SSD1322_DrawString(35, 20, 0, bal_str);
+						SSD1322_DrawString(52, 20, 0, (unsigned char*)"dB");
             break;
     }
 
@@ -884,12 +923,14 @@ SSD1322_DrawString(0, 0, 1,(unsigned char*)"USB PCM 768 ");
 */
 
 
-SSD1322_DrawAleksFull(35, 20, 1000);/// Пример вызова: X=30 (байт), Y=20 (строка)
+				SSD1322_DrawAleksFull(35, 20, 1000);/// Пример вызова: X=30 (байт), Y=20 (строка)
 
 //SSD1322_DrawString(0, 0, 0,(unsigned char*)"USB DSD 44.1");
 // ============================================================
 
-uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
+				uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
+				menu_need_update = 1; // Принудительный запуск экрана при старте прибора
+				menu_level = 1;       // Принудительно открываем шлагбаум для крутилки со старта!
 
 //===========================================================================================================================================================================
     while (1) {

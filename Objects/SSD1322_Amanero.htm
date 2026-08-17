@@ -3,9 +3,9 @@
 <title>Static Call Graph - [.\Objects\SSD1322_Amanero.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\SSD1322_Amanero.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Mon Aug 17 06:56:53 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Mon Aug 17 07:39:35 2026
 <BR><P>
-<H3>Maximum Stack Usage =        232 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        248 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 __rt_entry_main &rArr; main &rArr; Update_Bottom_Line &rArr; SSD1322_DrawString &rArr; SSD1322_DrawSingleAscii &rArr; SSD1322_Data_processing &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 <P>
@@ -206,7 +206,7 @@ Global Symbols
 <P><STRONG><a name="[b6]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[3f]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 232 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 248 + Unknown Stack Size
 <LI>Call Chain = __rt_entry_main &rArr; main &rArr; Update_Bottom_Line &rArr; SSD1322_DrawString &rArr; SSD1322_DrawSingleAscii &rArr; SSD1322_Data_processing &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
 <BR>[Calls]<UL><LI><a href="#[41]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exit
@@ -444,8 +444,8 @@ Global Symbols
 
 <P><STRONG><a name="[b9]"></a>I2C2_WriteByte</STRONG> (Thumb, 150 bytes, Stack size 4 bytes, main.o(.text), UNUSED)
 
-<P><STRONG><a name="[4b]"></a>Update_Bottom_Line</STRONG> (Thumb, 1130 bytes, Stack size 56 bytes, main.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 216<LI>Call Chain = Update_Bottom_Line &rArr; SSD1322_DrawString &rArr; SSD1322_DrawSingleAscii &rArr; SSD1322_Data_processing &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
+<P><STRONG><a name="[4b]"></a>Update_Bottom_Line</STRONG> (Thumb, 1482 bytes, Stack size 64 bytes, main.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 224<LI>Call Chain = Update_Bottom_Line &rArr; SSD1322_DrawString &rArr; SSD1322_DrawSingleAscii &rArr; SSD1322_Data_processing &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
 <BR>[Calls]<UL><LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_DrawString
 <LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_ClearRAM
@@ -534,8 +534,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[40]"></a>main</STRONG> (Thumb, 372 bytes, Stack size 16 bytes, main.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 232<LI>Call Chain = main &rArr; Update_Bottom_Line &rArr; SSD1322_DrawString &rArr; SSD1322_DrawSingleAscii &rArr; SSD1322_Data_processing &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
+<P><STRONG><a name="[40]"></a>main</STRONG> (Thumb, 396 bytes, Stack size 24 bytes, main.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 248<LI>Call Chain = main &rArr; Update_Bottom_Line &rArr; SSD1322_DrawString &rArr; SSD1322_DrawSingleAscii &rArr; SSD1322_Data_processing &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
 <BR>[Calls]<UL><LI><a href="#[6a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Connect_DAC
 <LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1322_Init

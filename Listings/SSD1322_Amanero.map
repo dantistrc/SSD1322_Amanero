@@ -19,6 +19,7 @@ Section Cross References
     main.o(.text) refers to main.o(.bss.preset) for preset
     main.o(.text) refers to stm32f10x_flash.o(.text) for FLASH_Unlock
     main.o(.text) refers to main.o(.bss.menu_mode_val) for menu_mode_val
+    main.o(.text) refers to main.o(.data.Update_Bottom_Line.last_mode) for Update_Bottom_Line.last_mode
     main.o(.text) refers to spi_ssd1322.o(.text) for SSD1322_ClearRAM
     main.o(.text) refers to main.o(.rodata.str1.1) for .L.str
     main.o(.text) refers to main.o(.data.volume_val) for volume_val
@@ -346,79 +347,81 @@ Image Symbol Table
     .ARM.Collect$$rtexit$$00000004           0x08000180   Section        6  rtexit2.o(.ARM.Collect$$rtexit$$00000004)
     .text                                    0x08000188   Section       64  startup_stm32f10x_md.o(.text)
     [Anonymous Symbol]                       0x080001c8   Section        0  main.o(.text)
-    NVIC_EnableIRQ                           0x08001541   Thumb Code    36  main.o(.text)
-    NVIC_SetPriority                         0x08001565   Thumb Code    68  main.o(.text)
-    [Anonymous Symbol]                       0x0800171c   Section        0  stm32f10x_flash.o(.text)
-    [Anonymous Symbol]                       0x08002180   Section        0  delay.o(.text)
-    delta                                    0x080021f5   Thumb Code    16  delay.o(.text)
-    [Anonymous Symbol]                       0x08002254   Section        0  dispport.o(.text)
-    [Anonymous Symbol]                       0x080023b8   Section        0  spi_ssd1322.o(.text)
-    byte_to_hex                              0x08002e9d   Thumb Code    52  spi_ssd1322.o(.text)
-    [Anonymous Symbol]                       0x08002ed0   Section        0  system_stm32f10x.o(.text)
-    SetSysClock                              0x08002f39   Thumb Code     8  system_stm32f10x.o(.text)
-    SetSysClockTo72                          0x08003065   Thumb Code   290  system_stm32f10x.o(.text)
-    [Anonymous Symbol]                       0x08003188   Section        0  encoder.o(.text)
-    NVIC_EnableIRQ                           0x08003279   Thumb Code    36  encoder.o(.text)
-    NVIC_SetPriority                         0x0800329d   Thumb Code    68  encoder.o(.text)
-    [Anonymous Symbol]                       0x08003300   Section        0  controlport.o(.text)
-    [Anonymous Symbol]                       0x0800340c   Section        0  uart_xmos.o(.text)
-    NVIC_EnableIRQ                           0x08003499   Thumb Code    36  uart_xmos.o(.text)
-    NVIC_SetPriority                         0x080034bd   Thumb Code    68  uart_xmos.o(.text)
-    [Anonymous Symbol]                       0x080035c4   Section        0  ir_remote_1.o(.text)
-    .text                                    0x080037c6   Section        0  heapauxi.o(.text)
-    .text                                    0x080037cc   Section       74  sys_stackheap_outer.o(.text)
-    .text                                    0x08003816   Section        0  exit.o(.text)
-    .text                                    0x08003828   Section        8  libspace.o(.text)
-    .text                                    0x08003830   Section        0  sys_exit.o(.text)
-    .text                                    0x0800383c   Section        2  use_no_semi.o(.text)
-    .text                                    0x0800383e   Section        0  indicate_semi.o(.text)
-    hex_chars                                0x080076f0   Data          17  spi_ssd1322.o(.rodata.hex_chars)
-    [Anonymous Symbol]                       0x080076f0   Section        0  spi_ssd1322.o(.rodata.hex_chars)
-    .L.str.3                                 0x08007701   Data           5  main.o(.rodata.str1.1)
-    [Anonymous Symbol]                       0x08007701   Section        0  main.o(.rodata.str1.1)
-    .L.str.2                                 0x08007706   Data           5  main.o(.rodata.str1.1)
-    .L.str.20                                0x0800770b   Data          11  main.o(.rodata.str1.1)
-    .L.str.16                                0x08007716   Data          11  main.o(.rodata.str1.1)
-    .L.str.4                                 0x08007721   Data           5  main.o(.rodata.str1.1)
-    .L.str.14                                0x08007726   Data          11  main.o(.rodata.str1.1)
-    .L.str.15                                0x08007731   Data          11  main.o(.rodata.str1.1)
-    .L.str.18                                0x0800773c   Data          11  main.o(.rodata.str1.1)
-    .L.str.17                                0x08007747   Data          11  main.o(.rodata.str1.1)
-    .L.str.19                                0x08007752   Data          11  main.o(.rodata.str1.1)
-    .L.str.34                                0x0800775d   Data          14  main.o(.rodata.str1.1)
-    .L.str.35                                0x0800776b   Data          14  main.o(.rodata.str1.1)
-    .L.str.38                                0x08007779   Data          14  main.o(.rodata.str1.1)
-    .L.str.37                                0x08007787   Data          14  main.o(.rodata.str1.1)
-    .L.str.36                                0x08007795   Data          14  main.o(.rodata.str1.1)
-    .L.str.1                                 0x080077a3   Data           3  main.o(.rodata.str1.1)
-    .L.str.39                                0x080077a6   Data          14  main.o(.rodata.str1.1)
-    .L.str                                   0x080077b4   Data           7  main.o(.rodata.str1.1)
-    .L.str.10                                0x080077bb   Data           6  main.o(.rodata.str1.1)
-    .L.str.21                                0x080077c1   Data           8  main.o(.rodata.str1.1)
-    .L.str.13                                0x080077c9   Data          11  main.o(.rodata.str1.1)
-    .L.str.5                                 0x080077d4   Data           6  main.o(.rodata.str1.1)
-    .L.str.9                                 0x080077da   Data           6  main.o(.rodata.str1.1)
-    .L.str.11                                0x080077e0   Data           6  main.o(.rodata.str1.1)
-    .L.str.8                                 0x080077e6   Data           6  main.o(.rodata.str1.1)
-    .L.str.12                                0x080077ec   Data           6  main.o(.rodata.str1.1)
-    .L.str.6                                 0x080077f2   Data           6  main.o(.rodata.str1.1)
-    .L.str.7                                 0x080077f8   Data           6  main.o(.rodata.str1.1)
-    .L.str.22                                0x080077fe   Data          14  main.o(.rodata.str1.1)
-    .L.str.32                                0x0800780c   Data          15  main.o(.rodata.str1.1)
-    .L.str.24                                0x0800781b   Data          14  main.o(.rodata.str1.1)
-    .L.str.27                                0x08007829   Data          14  main.o(.rodata.str1.1)
-    .L.str.26                                0x08007837   Data          14  main.o(.rodata.str1.1)
-    .L.str.29                                0x08007845   Data          14  main.o(.rodata.str1.1)
-    .L.str.30                                0x08007853   Data          14  main.o(.rodata.str1.1)
-    .L.str.33                                0x08007861   Data          15  main.o(.rodata.str1.1)
-    .L.str.25                                0x08007870   Data          14  main.o(.rodata.str1.1)
-    .L.str.28                                0x0800787e   Data          14  main.o(.rodata.str1.1)
-    .L.str.23                                0x0800788c   Data          14  main.o(.rodata.str1.1)
-    .L.str.31                                0x0800789a   Data          14  main.o(.rodata.str1.1)
+    NVIC_EnableIRQ                           0x080016a1   Thumb Code    36  main.o(.text)
+    NVIC_SetPriority                         0x080016c5   Thumb Code    68  main.o(.text)
+    [Anonymous Symbol]                       0x08001894   Section        0  stm32f10x_flash.o(.text)
+    [Anonymous Symbol]                       0x080022f8   Section        0  delay.o(.text)
+    delta                                    0x0800236d   Thumb Code    16  delay.o(.text)
+    [Anonymous Symbol]                       0x080023cc   Section        0  dispport.o(.text)
+    [Anonymous Symbol]                       0x08002530   Section        0  spi_ssd1322.o(.text)
+    byte_to_hex                              0x08003015   Thumb Code    52  spi_ssd1322.o(.text)
+    [Anonymous Symbol]                       0x08003048   Section        0  system_stm32f10x.o(.text)
+    SetSysClock                              0x080030b1   Thumb Code     8  system_stm32f10x.o(.text)
+    SetSysClockTo72                          0x080031dd   Thumb Code   290  system_stm32f10x.o(.text)
+    [Anonymous Symbol]                       0x08003300   Section        0  encoder.o(.text)
+    NVIC_EnableIRQ                           0x080033f1   Thumb Code    36  encoder.o(.text)
+    NVIC_SetPriority                         0x08003415   Thumb Code    68  encoder.o(.text)
+    [Anonymous Symbol]                       0x08003478   Section        0  controlport.o(.text)
+    [Anonymous Symbol]                       0x08003584   Section        0  uart_xmos.o(.text)
+    NVIC_EnableIRQ                           0x08003611   Thumb Code    36  uart_xmos.o(.text)
+    NVIC_SetPriority                         0x08003635   Thumb Code    68  uart_xmos.o(.text)
+    [Anonymous Symbol]                       0x0800373c   Section        0  ir_remote_1.o(.text)
+    .text                                    0x0800393e   Section        0  heapauxi.o(.text)
+    .text                                    0x08003944   Section       74  sys_stackheap_outer.o(.text)
+    .text                                    0x0800398e   Section        0  exit.o(.text)
+    .text                                    0x080039a0   Section        8  libspace.o(.text)
+    .text                                    0x080039a8   Section        0  sys_exit.o(.text)
+    .text                                    0x080039b4   Section        2  use_no_semi.o(.text)
+    .text                                    0x080039b6   Section        0  indicate_semi.o(.text)
+    hex_chars                                0x08007868   Data          17  spi_ssd1322.o(.rodata.hex_chars)
+    [Anonymous Symbol]                       0x08007868   Section        0  spi_ssd1322.o(.rodata.hex_chars)
+    .L.str.3                                 0x08007879   Data           5  main.o(.rodata.str1.1)
+    [Anonymous Symbol]                       0x08007879   Section        0  main.o(.rodata.str1.1)
+    .L.str.2                                 0x0800787e   Data           5  main.o(.rodata.str1.1)
+    .L.str.20                                0x08007883   Data          11  main.o(.rodata.str1.1)
+    .L.str.16                                0x0800788e   Data          11  main.o(.rodata.str1.1)
+    .L.str.4                                 0x08007899   Data           5  main.o(.rodata.str1.1)
+    .L.str.14                                0x0800789e   Data          11  main.o(.rodata.str1.1)
+    .L.str.15                                0x080078a9   Data          11  main.o(.rodata.str1.1)
+    .L.str.18                                0x080078b4   Data          11  main.o(.rodata.str1.1)
+    .L.str.17                                0x080078bf   Data          11  main.o(.rodata.str1.1)
+    .L.str.19                                0x080078ca   Data          11  main.o(.rodata.str1.1)
+    .L.str.34                                0x080078d5   Data          14  main.o(.rodata.str1.1)
+    .L.str.35                                0x080078e3   Data          14  main.o(.rodata.str1.1)
+    .L.str.38                                0x080078f1   Data          14  main.o(.rodata.str1.1)
+    .L.str.37                                0x080078ff   Data          14  main.o(.rodata.str1.1)
+    .L.str.36                                0x0800790d   Data          14  main.o(.rodata.str1.1)
+    .L.str.1                                 0x0800791b   Data           3  main.o(.rodata.str1.1)
+    .L.str.39                                0x0800791e   Data          14  main.o(.rodata.str1.1)
+    .L.str.10                                0x0800792c   Data           6  main.o(.rodata.str1.1)
+    .L.str.21                                0x08007932   Data           8  main.o(.rodata.str1.1)
+    .L.str                                   0x0800793a   Data           7  main.o(.rodata.str1.1)
+    .L.str.13                                0x08007941   Data          11  main.o(.rodata.str1.1)
+    .L.str.5                                 0x0800794c   Data           6  main.o(.rodata.str1.1)
+    .L.str.9                                 0x08007952   Data           6  main.o(.rodata.str1.1)
+    .L.str.11                                0x08007958   Data           6  main.o(.rodata.str1.1)
+    .L.str.8                                 0x0800795e   Data           6  main.o(.rodata.str1.1)
+    .L.str.12                                0x08007964   Data           6  main.o(.rodata.str1.1)
+    .L.str.6                                 0x0800796a   Data           6  main.o(.rodata.str1.1)
+    .L.str.7                                 0x08007970   Data           6  main.o(.rodata.str1.1)
+    .L.str.22                                0x08007976   Data          14  main.o(.rodata.str1.1)
+    .L.str.32                                0x08007984   Data          15  main.o(.rodata.str1.1)
+    .L.str.24                                0x08007993   Data          14  main.o(.rodata.str1.1)
+    .L.str.27                                0x080079a1   Data          14  main.o(.rodata.str1.1)
+    .L.str.26                                0x080079af   Data          14  main.o(.rodata.str1.1)
+    .L.str.29                                0x080079bd   Data          14  main.o(.rodata.str1.1)
+    .L.str.30                                0x080079cb   Data          14  main.o(.rodata.str1.1)
+    .L.str.33                                0x080079d9   Data          15  main.o(.rodata.str1.1)
+    .L.str.25                                0x080079e8   Data          14  main.o(.rodata.str1.1)
+    .L.str.28                                0x080079f6   Data          14  main.o(.rodata.str1.1)
+    .L.str.23                                0x08007a04   Data          14  main.o(.rodata.str1.1)
+    .L.str.31                                0x08007a12   Data          14  main.o(.rodata.str1.1)
     Process_Encoder_Rotation.input           0x20000000   Data           1  main.o(.data.Process_Encoder_Rotation.input)
     [Anonymous Symbol]                       0x20000000   Section        0  main.o(.data.Process_Encoder_Rotation.input)
     Process_Encoder_Rotation.vol             0x20000001   Data           1  main.o(.data.Process_Encoder_Rotation.vol)
     [Anonymous Symbol]                       0x20000001   Section        0  main.o(.data.Process_Encoder_Rotation.vol)
+    Update_Bottom_Line.last_mode             0x20000008   Data           1  main.o(.data.Update_Bottom_Line.last_mode)
+    [Anonymous Symbol]                       0x20000008   Section        0  main.o(.data.Update_Bottom_Line.last_mode)
     .bss                                     0x20000018   Section       96  libspace.o(.bss)
     Process_Encoder_Rotation.filter          0x20000078   Data           1  main.o(.bss.Process_Encoder_Rotation.filter)
     [Anonymous Symbol]                       0x20000078   Section        0  main.o(.bss.Process_Encoder_Rotation.filter)
@@ -571,126 +574,126 @@ Image Symbol Table
     FLASH_WriteSettings                      0x08000219   Thumb Code    94  main.o(.text)
     I2C2_Init                                0x08000279   Thumb Code   146  main.o(.text)
     I2C2_WriteByte                           0x0800030d   Thumb Code   150  main.o(.text)
-    Update_Bottom_Line                       0x080003a5   Thumb Code  1130  main.o(.text)
-    Process_XMOS_Signal                      0x08000811   Thumb Code   422  main.o(.text)
-    Process_Encoder_Rotation                 0x080009b9   Thumb Code   326  main.o(.text)
-    ProcessButtonPress                       0x08000b01   Thumb Code   488  main.o(.text)
-    EXTI9_5_IRQHandler                       0x08000ce9   Thumb Code   116  main.o(.text)
-    TIM4_IRQHandler                          0x08000d5d   Thumb Code   288  main.o(.text)
-    TIM2_IRQHandler                          0x08000e7d   Thumb Code   758  main.o(.text)
-    ESS9028_WriteReg                         0x08001175   Thumb Code   212  main.o(.text)
-    ESS9028_SetFilter                        0x08001249   Thumb Code    66  main.o(.text)
-    ESS9028_SetInput                         0x0800128d   Thumb Code   106  main.o(.text)
-    MUTED_LCD                                0x080012f9   Thumb Code    60  main.o(.text)
-    SSD1322_DrawAleksFull                    0x08001335   Thumb Code   302  main.o(.text)
-    IR_Init                                  0x08001465   Thumb Code   218  main.o(.text)
-    main                                     0x080015a9   Thumb Code   372  main.o(.text)
-    FLASH_SetLatency                         0x0800171d   Thumb Code    44  stm32f10x_flash.o(.text)
-    FLASH_HalfCycleAccessCmd                 0x08001749   Thumb Code    32  stm32f10x_flash.o(.text)
-    FLASH_PrefetchBufferCmd                  0x08001769   Thumb Code    32  stm32f10x_flash.o(.text)
-    FLASH_Unlock                             0x08001789   Thumb Code    30  stm32f10x_flash.o(.text)
-    FLASH_UnlockBank1                        0x080017a9   Thumb Code    30  stm32f10x_flash.o(.text)
-    FLASH_Lock                               0x080017c9   Thumb Code    18  stm32f10x_flash.o(.text)
-    FLASH_LockBank1                          0x080017dd   Thumb Code    18  stm32f10x_flash.o(.text)
-    FLASH_ErasePage                          0x080017f1   Thumb Code   106  stm32f10x_flash.o(.text)
-    FLASH_WaitForLastOperation               0x0800185d   Thumb Code    94  stm32f10x_flash.o(.text)
-    FLASH_EraseAllPages                      0x080018bd   Thumb Code    92  stm32f10x_flash.o(.text)
-    FLASH_EraseAllBank1Pages                 0x08001919   Thumb Code    92  stm32f10x_flash.o(.text)
-    FLASH_WaitForLastBank1Operation          0x08001975   Thumb Code    94  stm32f10x_flash.o(.text)
-    FLASH_EraseOptionBytes                   0x080019d5   Thumb Code   254  stm32f10x_flash.o(.text)
-    FLASH_GetReadOutProtectionStatus         0x08001ad5   Thumb Code    50  stm32f10x_flash.o(.text)
-    FLASH_ProgramWord                        0x08001b09   Thumb Code   160  stm32f10x_flash.o(.text)
-    FLASH_ProgramHalfWord                    0x08001ba9   Thumb Code    98  stm32f10x_flash.o(.text)
-    FLASH_ProgramOptionByteData              0x08001c0d   Thumb Code   142  stm32f10x_flash.o(.text)
-    FLASH_EnableWriteProtection              0x08001c9d   Thumb Code   360  stm32f10x_flash.o(.text)
-    FLASH_ReadOutProtection                  0x08001e05   Thumb Code   258  stm32f10x_flash.o(.text)
-    FLASH_UserOptionByteConfig               0x08001f09   Thumb Code   170  stm32f10x_flash.o(.text)
-    FLASH_GetUserOptionByte                  0x08001fb5   Thumb Code    14  stm32f10x_flash.o(.text)
-    FLASH_GetWriteProtectionOptionByte       0x08001fc5   Thumb Code    12  stm32f10x_flash.o(.text)
-    FLASH_GetPrefetchBufferStatus            0x08001fd1   Thumb Code    50  stm32f10x_flash.o(.text)
-    FLASH_ITConfig                           0x08002005   Thumb Code    56  stm32f10x_flash.o(.text)
-    FLASH_GetFlagStatus                      0x0800203d   Thumb Code    96  stm32f10x_flash.o(.text)
-    FLASH_ClearFlag                          0x0800209d   Thumb Code    20  stm32f10x_flash.o(.text)
-    FLASH_GetStatus                          0x080020b1   Thumb Code   104  stm32f10x_flash.o(.text)
-    FLASH_GetBank1Status                     0x08002119   Thumb Code   104  stm32f10x_flash.o(.text)
-    DWT_Init                                 0x08002181   Thumb Code    34  delay.o(.text)
-    delay_us                                 0x080021a5   Thumb Code    80  delay.o(.text)
-    delay_ms                                 0x08002205   Thumb Code    80  delay.o(.text)
-    DAC_port_Init                            0x08002255   Thumb Code   158  dispport.o(.text)
-    MUTE_State                               0x080022f5   Thumb Code    34  dispport.o(.text)
-    DSD_State                                0x08002319   Thumb Code    16  dispport.o(.text)
-    F0_State                                 0x08002329   Thumb Code    16  dispport.o(.text)
-    F1_State                                 0x08002339   Thumb Code    16  dispport.o(.text)
-    F2_State                                 0x08002349   Thumb Code    16  dispport.o(.text)
-    F3_State                                 0x08002359   Thumb Code    16  dispport.o(.text)
-    Stream_ID                                0x08002369   Thumb Code    12  dispport.o(.text)
-    Connect_DAC                              0x08002375   Thumb Code    30  dispport.o(.text)
-    Master_Slave_Sel                         0x08002395   Thumb Code    34  dispport.o(.text)
-    SPI4W_Init                               0x080023b9   Thumb Code   196  spi_ssd1322.o(.text)
-    Spi_Write_Data                           0x0800247d   Thumb Code    76  spi_ssd1322.o(.text)
-    SSD1322_DataWrite                        0x080024c9   Thumb Code    20  spi_ssd1322.o(.text)
-    SSD1322_CommandWrite                     0x080024dd   Thumb Code    42  spi_ssd1322.o(.text)
-    SSD1322_CmdDataWrite                     0x08002509   Thumb Code    32  spi_ssd1322.o(.text)
-    SSD1322_Reset                            0x08002529   Thumb Code    36  spi_ssd1322.o(.text)
-    SSD1322_Init                             0x0800254d   Thumb Code   206  spi_ssd1322.o(.text)
-    SSD1322_ClearRAM                         0x0800261d   Thumb Code   106  spi_ssd1322.o(.text)
-    SSD1322_SetRowAddress                    0x08002689   Thumb Code    44  spi_ssd1322.o(.text)
-    SSD1322_SetColumnAddress                 0x080026b5   Thumb Code    48  spi_ssd1322.o(.text)
-    SSD1322_Data_processing                  0x080026e5   Thumb Code   370  spi_ssd1322.o(.text)
-    SSD1322_DrawSingleAscii                  0x08002859   Thumb Code   246  spi_ssd1322.o(.text)
-    SSD1322_DrawString                       0x08002951   Thumb Code   116  spi_ssd1322.o(.text)
-    SSD1322_DrawSmallChar                    0x080029c5   Thumb Code   162  spi_ssd1322.o(.text)
-    SSD1322_DrawSmallString                  0x08002a69   Thumb Code    62  spi_ssd1322.o(.text)
-    SSD1322_DrawCharBuffer                   0x08002aa9   Thumb Code   170  spi_ssd1322.o(.text)
-    SSD1322_DrawPixel                        0x08002b55   Thumb Code   126  spi_ssd1322.o(.text)
-    SSD1322_DrawStringBuffer                 0x08002bd5   Thumb Code    62  spi_ssd1322.o(.text)
-    SSD1322_ClearBuffer                      0x08002c15   Thumb Code    46  spi_ssd1322.o(.text)
-    SSD1322_Update                           0x08002c45   Thumb Code   104  spi_ssd1322.o(.text)
-    SSD1322_FillPattern                      0x08002cad   Thumb Code    52  spi_ssd1322.o(.text)
-    SSD1322_Display_Picture                  0x08002ce1   Thumb Code    94  spi_ssd1322.o(.text)
-    Gray_test                                0x08002d41   Thumb Code   230  spi_ssd1322.o(.text)
-    DebugUartHex                             0x08002e29   Thumb Code   114  spi_ssd1322.o(.text)
-    SystemInit                               0x08002ed1   Thumb Code   102  system_stm32f10x.o(.text)
-    SystemCoreClockUpdate                    0x08002f41   Thumb Code   290  system_stm32f10x.o(.text)
-    Encoder_Init                             0x08003189   Thumb Code   238  encoder.o(.text)
-    Encoder_read                             0x080032e1   Thumb Code    10  encoder.o(.text)
-    Encoder_direction                        0x080032ed   Thumb Code    18  encoder.o(.text)
-    Control_port_Init                        0x08003301   Thumb Code   106  controlport.o(.text)
-    MASTER_DAC                               0x0800336d   Thumb Code    30  controlport.o(.text)
-    DSD_DAC                                  0x0800338d   Thumb Code    30  controlport.o(.text)
-    MCLK_DAC                                 0x080033ad   Thumb Code    30  controlport.o(.text)
-    SLOW_BIT_DAC                             0x080033cd   Thumb Code    30  controlport.o(.text)
-    SD_BIT_DAC                               0x080033ed   Thumb Code    30  controlport.o(.text)
-    UART_Init                                0x0800340d   Thumb Code   138  uart_xmos.o(.text)
-    UART_ReadByte                            0x08003501   Thumb Code    60  uart_xmos.o(.text)
-    UART_XMOS_GetSignal                      0x0800353d   Thumb Code    12  uart_xmos.o(.text)
-    USART1_IRQHandler                        0x08003549   Thumb Code   122  uart_xmos.o(.text)
-    IR_Process_Bit                           0x080035c5   Thumb Code   418  ir_remote_1.o(.text)
-    IR_GetPacket                             0x08003769   Thumb Code    94  ir_remote_1.o(.text)
-    __use_two_region_memory                  0x080037c7   Thumb Code     2  heapauxi.o(.text)
-    __rt_heap_escrow$2region                 0x080037c9   Thumb Code     2  heapauxi.o(.text)
-    __rt_heap_expand$2region                 0x080037cb   Thumb Code     2  heapauxi.o(.text)
-    __user_setup_stackheap                   0x080037cd   Thumb Code    74  sys_stackheap_outer.o(.text)
-    exit                                     0x08003817   Thumb Code    18  exit.o(.text)
-    __user_libspace                          0x08003829   Thumb Code     8  libspace.o(.text)
-    __user_perproc_libspace                  0x08003829   Thumb Code     0  libspace.o(.text)
-    __user_perthread_libspace                0x08003829   Thumb Code     0  libspace.o(.text)
-    _sys_exit                                0x08003831   Thumb Code     8  sys_exit.o(.text)
-    __I$use$semihosting                      0x0800383d   Thumb Code     0  use_no_semi.o(.text)
-    __use_no_semihosting_swi                 0x0800383d   Thumb Code     2  use_no_semi.o(.text)
-    AHBPrescTable                            0x0800383e   Data          16  system_stm32f10x.o(.rodata.AHBPrescTable)
-    __semihosting_library_function           0x0800383f   Thumb Code     0  indicate_semi.o(.text)
-    AsciiLib_Big                             0x0800384e   Data       11648  spi_ssd1322.o(.rodata.AsciiLib_Big)
-    AsciiLib_Small                           0x080065ce   Data        3040  spi_ssd1322.o(.rodata.AsciiLib_Small)
-    Font_Aleks38x24                          0x080071b0   Data         780  main.o(.rodata.Font_Aleks38x24)
-    SmallFont                                0x080074bc   Data         564  spi_ssd1322.o(.rodata.SmallFont)
-    Region$$Table$$Base                      0x080078a8   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x080078c8   Number         0  anon$$obj.o(Region$$Table)
+    Update_Bottom_Line                       0x080003a5   Thumb Code  1482  main.o(.text)
+    Process_XMOS_Signal                      0x08000971   Thumb Code   422  main.o(.text)
+    Process_Encoder_Rotation                 0x08000b19   Thumb Code   326  main.o(.text)
+    ProcessButtonPress                       0x08000c61   Thumb Code   488  main.o(.text)
+    EXTI9_5_IRQHandler                       0x08000e49   Thumb Code   116  main.o(.text)
+    TIM4_IRQHandler                          0x08000ebd   Thumb Code   288  main.o(.text)
+    TIM2_IRQHandler                          0x08000fdd   Thumb Code   758  main.o(.text)
+    ESS9028_WriteReg                         0x080012d5   Thumb Code   212  main.o(.text)
+    ESS9028_SetFilter                        0x080013a9   Thumb Code    66  main.o(.text)
+    ESS9028_SetInput                         0x080013ed   Thumb Code   106  main.o(.text)
+    MUTED_LCD                                0x08001459   Thumb Code    60  main.o(.text)
+    SSD1322_DrawAleksFull                    0x08001495   Thumb Code   302  main.o(.text)
+    IR_Init                                  0x080015c5   Thumb Code   218  main.o(.text)
+    main                                     0x08001709   Thumb Code   396  main.o(.text)
+    FLASH_SetLatency                         0x08001895   Thumb Code    44  stm32f10x_flash.o(.text)
+    FLASH_HalfCycleAccessCmd                 0x080018c1   Thumb Code    32  stm32f10x_flash.o(.text)
+    FLASH_PrefetchBufferCmd                  0x080018e1   Thumb Code    32  stm32f10x_flash.o(.text)
+    FLASH_Unlock                             0x08001901   Thumb Code    30  stm32f10x_flash.o(.text)
+    FLASH_UnlockBank1                        0x08001921   Thumb Code    30  stm32f10x_flash.o(.text)
+    FLASH_Lock                               0x08001941   Thumb Code    18  stm32f10x_flash.o(.text)
+    FLASH_LockBank1                          0x08001955   Thumb Code    18  stm32f10x_flash.o(.text)
+    FLASH_ErasePage                          0x08001969   Thumb Code   106  stm32f10x_flash.o(.text)
+    FLASH_WaitForLastOperation               0x080019d5   Thumb Code    94  stm32f10x_flash.o(.text)
+    FLASH_EraseAllPages                      0x08001a35   Thumb Code    92  stm32f10x_flash.o(.text)
+    FLASH_EraseAllBank1Pages                 0x08001a91   Thumb Code    92  stm32f10x_flash.o(.text)
+    FLASH_WaitForLastBank1Operation          0x08001aed   Thumb Code    94  stm32f10x_flash.o(.text)
+    FLASH_EraseOptionBytes                   0x08001b4d   Thumb Code   254  stm32f10x_flash.o(.text)
+    FLASH_GetReadOutProtectionStatus         0x08001c4d   Thumb Code    50  stm32f10x_flash.o(.text)
+    FLASH_ProgramWord                        0x08001c81   Thumb Code   160  stm32f10x_flash.o(.text)
+    FLASH_ProgramHalfWord                    0x08001d21   Thumb Code    98  stm32f10x_flash.o(.text)
+    FLASH_ProgramOptionByteData              0x08001d85   Thumb Code   142  stm32f10x_flash.o(.text)
+    FLASH_EnableWriteProtection              0x08001e15   Thumb Code   360  stm32f10x_flash.o(.text)
+    FLASH_ReadOutProtection                  0x08001f7d   Thumb Code   258  stm32f10x_flash.o(.text)
+    FLASH_UserOptionByteConfig               0x08002081   Thumb Code   170  stm32f10x_flash.o(.text)
+    FLASH_GetUserOptionByte                  0x0800212d   Thumb Code    14  stm32f10x_flash.o(.text)
+    FLASH_GetWriteProtectionOptionByte       0x0800213d   Thumb Code    12  stm32f10x_flash.o(.text)
+    FLASH_GetPrefetchBufferStatus            0x08002149   Thumb Code    50  stm32f10x_flash.o(.text)
+    FLASH_ITConfig                           0x0800217d   Thumb Code    56  stm32f10x_flash.o(.text)
+    FLASH_GetFlagStatus                      0x080021b5   Thumb Code    96  stm32f10x_flash.o(.text)
+    FLASH_ClearFlag                          0x08002215   Thumb Code    20  stm32f10x_flash.o(.text)
+    FLASH_GetStatus                          0x08002229   Thumb Code   104  stm32f10x_flash.o(.text)
+    FLASH_GetBank1Status                     0x08002291   Thumb Code   104  stm32f10x_flash.o(.text)
+    DWT_Init                                 0x080022f9   Thumb Code    34  delay.o(.text)
+    delay_us                                 0x0800231d   Thumb Code    80  delay.o(.text)
+    delay_ms                                 0x0800237d   Thumb Code    80  delay.o(.text)
+    DAC_port_Init                            0x080023cd   Thumb Code   158  dispport.o(.text)
+    MUTE_State                               0x0800246d   Thumb Code    34  dispport.o(.text)
+    DSD_State                                0x08002491   Thumb Code    16  dispport.o(.text)
+    F0_State                                 0x080024a1   Thumb Code    16  dispport.o(.text)
+    F1_State                                 0x080024b1   Thumb Code    16  dispport.o(.text)
+    F2_State                                 0x080024c1   Thumb Code    16  dispport.o(.text)
+    F3_State                                 0x080024d1   Thumb Code    16  dispport.o(.text)
+    Stream_ID                                0x080024e1   Thumb Code    12  dispport.o(.text)
+    Connect_DAC                              0x080024ed   Thumb Code    30  dispport.o(.text)
+    Master_Slave_Sel                         0x0800250d   Thumb Code    34  dispport.o(.text)
+    SPI4W_Init                               0x08002531   Thumb Code   196  spi_ssd1322.o(.text)
+    Spi_Write_Data                           0x080025f5   Thumb Code    76  spi_ssd1322.o(.text)
+    SSD1322_DataWrite                        0x08002641   Thumb Code    20  spi_ssd1322.o(.text)
+    SSD1322_CommandWrite                     0x08002655   Thumb Code    42  spi_ssd1322.o(.text)
+    SSD1322_CmdDataWrite                     0x08002681   Thumb Code    32  spi_ssd1322.o(.text)
+    SSD1322_Reset                            0x080026a1   Thumb Code    36  spi_ssd1322.o(.text)
+    SSD1322_Init                             0x080026c5   Thumb Code   206  spi_ssd1322.o(.text)
+    SSD1322_ClearRAM                         0x08002795   Thumb Code   106  spi_ssd1322.o(.text)
+    SSD1322_SetRowAddress                    0x08002801   Thumb Code    44  spi_ssd1322.o(.text)
+    SSD1322_SetColumnAddress                 0x0800282d   Thumb Code    48  spi_ssd1322.o(.text)
+    SSD1322_Data_processing                  0x0800285d   Thumb Code   370  spi_ssd1322.o(.text)
+    SSD1322_DrawSingleAscii                  0x080029d1   Thumb Code   246  spi_ssd1322.o(.text)
+    SSD1322_DrawString                       0x08002ac9   Thumb Code   116  spi_ssd1322.o(.text)
+    SSD1322_DrawSmallChar                    0x08002b3d   Thumb Code   162  spi_ssd1322.o(.text)
+    SSD1322_DrawSmallString                  0x08002be1   Thumb Code    62  spi_ssd1322.o(.text)
+    SSD1322_DrawCharBuffer                   0x08002c21   Thumb Code   170  spi_ssd1322.o(.text)
+    SSD1322_DrawPixel                        0x08002ccd   Thumb Code   126  spi_ssd1322.o(.text)
+    SSD1322_DrawStringBuffer                 0x08002d4d   Thumb Code    62  spi_ssd1322.o(.text)
+    SSD1322_ClearBuffer                      0x08002d8d   Thumb Code    46  spi_ssd1322.o(.text)
+    SSD1322_Update                           0x08002dbd   Thumb Code   104  spi_ssd1322.o(.text)
+    SSD1322_FillPattern                      0x08002e25   Thumb Code    52  spi_ssd1322.o(.text)
+    SSD1322_Display_Picture                  0x08002e59   Thumb Code    94  spi_ssd1322.o(.text)
+    Gray_test                                0x08002eb9   Thumb Code   230  spi_ssd1322.o(.text)
+    DebugUartHex                             0x08002fa1   Thumb Code   114  spi_ssd1322.o(.text)
+    SystemInit                               0x08003049   Thumb Code   102  system_stm32f10x.o(.text)
+    SystemCoreClockUpdate                    0x080030b9   Thumb Code   290  system_stm32f10x.o(.text)
+    Encoder_Init                             0x08003301   Thumb Code   238  encoder.o(.text)
+    Encoder_read                             0x08003459   Thumb Code    10  encoder.o(.text)
+    Encoder_direction                        0x08003465   Thumb Code    18  encoder.o(.text)
+    Control_port_Init                        0x08003479   Thumb Code   106  controlport.o(.text)
+    MASTER_DAC                               0x080034e5   Thumb Code    30  controlport.o(.text)
+    DSD_DAC                                  0x08003505   Thumb Code    30  controlport.o(.text)
+    MCLK_DAC                                 0x08003525   Thumb Code    30  controlport.o(.text)
+    SLOW_BIT_DAC                             0x08003545   Thumb Code    30  controlport.o(.text)
+    SD_BIT_DAC                               0x08003565   Thumb Code    30  controlport.o(.text)
+    UART_Init                                0x08003585   Thumb Code   138  uart_xmos.o(.text)
+    UART_ReadByte                            0x08003679   Thumb Code    60  uart_xmos.o(.text)
+    UART_XMOS_GetSignal                      0x080036b5   Thumb Code    12  uart_xmos.o(.text)
+    USART1_IRQHandler                        0x080036c1   Thumb Code   122  uart_xmos.o(.text)
+    IR_Process_Bit                           0x0800373d   Thumb Code   418  ir_remote_1.o(.text)
+    IR_GetPacket                             0x080038e1   Thumb Code    94  ir_remote_1.o(.text)
+    __use_two_region_memory                  0x0800393f   Thumb Code     2  heapauxi.o(.text)
+    __rt_heap_escrow$2region                 0x08003941   Thumb Code     2  heapauxi.o(.text)
+    __rt_heap_expand$2region                 0x08003943   Thumb Code     2  heapauxi.o(.text)
+    __user_setup_stackheap                   0x08003945   Thumb Code    74  sys_stackheap_outer.o(.text)
+    exit                                     0x0800398f   Thumb Code    18  exit.o(.text)
+    __user_libspace                          0x080039a1   Thumb Code     8  libspace.o(.text)
+    __user_perproc_libspace                  0x080039a1   Thumb Code     0  libspace.o(.text)
+    __user_perthread_libspace                0x080039a1   Thumb Code     0  libspace.o(.text)
+    _sys_exit                                0x080039a9   Thumb Code     8  sys_exit.o(.text)
+    __I$use$semihosting                      0x080039b5   Thumb Code     0  use_no_semi.o(.text)
+    __use_no_semihosting_swi                 0x080039b5   Thumb Code     2  use_no_semi.o(.text)
+    AHBPrescTable                            0x080039b6   Data          16  system_stm32f10x.o(.rodata.AHBPrescTable)
+    __semihosting_library_function           0x080039b7   Thumb Code     0  indicate_semi.o(.text)
+    AsciiLib_Big                             0x080039c6   Data       11648  spi_ssd1322.o(.rodata.AsciiLib_Big)
+    AsciiLib_Small                           0x08006746   Data        3040  spi_ssd1322.o(.rodata.AsciiLib_Small)
+    Font_Aleks38x24                          0x08007328   Data         780  main.o(.rodata.Font_Aleks38x24)
+    SmallFont                                0x08007634   Data         564  spi_ssd1322.o(.rodata.SmallFont)
+    Region$$Table$$Base                      0x08007a20   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08007a40   Number         0  anon$$obj.o(Region$$Table)
     SystemCoreClock                          0x20000004   Data           4  system_stm32f10x.o(.data.SystemCoreClock)
-    hall_timer_sec                           0x20000008   Data           4  main.o(.data.hall_timer_sec)
-    menu_timer_sec                           0x2000000c   Data           4  main.o(.data.menu_timer_sec)
-    updated                                  0x20000010   Data           1  main.o(.data.updated)
-    volume_val                               0x20000011   Data           1  main.o(.data.volume_val)
+    hall_timer_sec                           0x2000000c   Data           4  main.o(.data.hall_timer_sec)
+    menu_timer_sec                           0x20000010   Data           4  main.o(.data.menu_timer_sec)
+    updated                                  0x20000014   Data           1  main.o(.data.updated)
+    volume_val                               0x20000015   Data           1  main.o(.data.volume_val)
     __libspace_start                         0x20000018   Data          96  libspace.o(.bss)
     __temporary_stack_top$libspace           0x20000078   Data           0  libspace.o(.bss)
     balance_val                              0x20000079   Data           1  main.o(.bss.balance_val)
@@ -729,143 +732,145 @@ Memory Map of the image
 
   Image Entry point : 0x080000ed
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x000078e0, Max: 0x00010000, ABSOLUTE)
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00007a58, Max: 0x00010000, ABSOLUTE)
 
-    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x000078c8, Max: 0x00010000, ABSOLUTE)
+    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00007a40, Max: 0x00010000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x08000000   0x08000000   0x000000ec   Data   RO            3    RESET               startup_stm32f10x_md.o
-    0x080000ec   0x080000ec   0x00000008   Code   RO          147  * !!!main             c_w.l(__main.o)
-    0x080000f4   0x080000f4   0x00000034   Code   RO          312    !!!scatter          c_w.l(__scatter.o)
-    0x08000128   0x08000128   0x0000001a   Code   RO          314    !!handler_copy      c_w.l(__scatter_copy.o)
+    0x080000ec   0x080000ec   0x00000008   Code   RO          148  * !!!main             c_w.l(__main.o)
+    0x080000f4   0x080000f4   0x00000034   Code   RO          313    !!!scatter          c_w.l(__scatter.o)
+    0x08000128   0x08000128   0x0000001a   Code   RO          315    !!handler_copy      c_w.l(__scatter_copy.o)
     0x08000142   0x08000142   0x00000002   PAD
-    0x08000144   0x08000144   0x0000001c   Code   RO          316    !!handler_zi        c_w.l(__scatter_zi.o)
-    0x08000160   0x08000160   0x00000002   Code   RO          174    .ARM.Collect$$libinit$$00000000  c_w.l(libinit.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          181    .ARM.Collect$$libinit$$00000002  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          183    .ARM.Collect$$libinit$$00000004  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          185    .ARM.Collect$$libinit$$00000006  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          188    .ARM.Collect$$libinit$$0000000C  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          190    .ARM.Collect$$libinit$$0000000E  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          192    .ARM.Collect$$libinit$$00000010  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          195    .ARM.Collect$$libinit$$00000013  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          197    .ARM.Collect$$libinit$$00000015  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          199    .ARM.Collect$$libinit$$00000017  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          201    .ARM.Collect$$libinit$$00000019  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          203    .ARM.Collect$$libinit$$0000001B  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          205    .ARM.Collect$$libinit$$0000001D  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          207    .ARM.Collect$$libinit$$0000001F  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          209    .ARM.Collect$$libinit$$00000021  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          211    .ARM.Collect$$libinit$$00000023  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          213    .ARM.Collect$$libinit$$00000025  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          215    .ARM.Collect$$libinit$$00000027  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          219    .ARM.Collect$$libinit$$0000002E  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          221    .ARM.Collect$$libinit$$00000030  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          223    .ARM.Collect$$libinit$$00000032  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000000   Code   RO          225    .ARM.Collect$$libinit$$00000034  c_w.l(libinit2.o)
-    0x08000162   0x08000162   0x00000002   Code   RO          226    .ARM.Collect$$libinit$$00000035  c_w.l(libinit2.o)
-    0x08000164   0x08000164   0x00000002   Code   RO          248    .ARM.Collect$$libshutdown$$00000000  c_w.l(libshutdown.o)
-    0x08000166   0x08000166   0x00000000   Code   RO          263    .ARM.Collect$$libshutdown$$00000002  c_w.l(libshutdown2.o)
-    0x08000166   0x08000166   0x00000000   Code   RO          265    .ARM.Collect$$libshutdown$$00000004  c_w.l(libshutdown2.o)
-    0x08000166   0x08000166   0x00000000   Code   RO          268    .ARM.Collect$$libshutdown$$00000007  c_w.l(libshutdown2.o)
-    0x08000166   0x08000166   0x00000000   Code   RO          271    .ARM.Collect$$libshutdown$$0000000A  c_w.l(libshutdown2.o)
-    0x08000166   0x08000166   0x00000000   Code   RO          273    .ARM.Collect$$libshutdown$$0000000C  c_w.l(libshutdown2.o)
-    0x08000166   0x08000166   0x00000000   Code   RO          276    .ARM.Collect$$libshutdown$$0000000F  c_w.l(libshutdown2.o)
-    0x08000166   0x08000166   0x00000002   Code   RO          277    .ARM.Collect$$libshutdown$$00000010  c_w.l(libshutdown2.o)
-    0x08000168   0x08000168   0x00000000   Code   RO          149    .ARM.Collect$$rtentry$$00000000  c_w.l(__rtentry.o)
-    0x08000168   0x08000168   0x00000000   Code   RO          151    .ARM.Collect$$rtentry$$00000002  c_w.l(__rtentry2.o)
-    0x08000168   0x08000168   0x00000006   Code   RO          163    .ARM.Collect$$rtentry$$00000004  c_w.l(__rtentry4.o)
-    0x0800016e   0x0800016e   0x00000000   Code   RO          153    .ARM.Collect$$rtentry$$00000009  c_w.l(__rtentry2.o)
-    0x0800016e   0x0800016e   0x00000004   Code   RO          154    .ARM.Collect$$rtentry$$0000000A  c_w.l(__rtentry2.o)
-    0x08000172   0x08000172   0x00000000   Code   RO          156    .ARM.Collect$$rtentry$$0000000C  c_w.l(__rtentry2.o)
-    0x08000172   0x08000172   0x00000008   Code   RO          157    .ARM.Collect$$rtentry$$0000000D  c_w.l(__rtentry2.o)
-    0x0800017a   0x0800017a   0x00000002   Code   RO          178    .ARM.Collect$$rtexit$$00000000  c_w.l(rtexit.o)
-    0x0800017c   0x0800017c   0x00000000   Code   RO          228    .ARM.Collect$$rtexit$$00000002  c_w.l(rtexit2.o)
-    0x0800017c   0x0800017c   0x00000004   Code   RO          229    .ARM.Collect$$rtexit$$00000003  c_w.l(rtexit2.o)
-    0x08000180   0x08000180   0x00000006   Code   RO          230    .ARM.Collect$$rtexit$$00000004  c_w.l(rtexit2.o)
+    0x08000144   0x08000144   0x0000001c   Code   RO          317    !!handler_zi        c_w.l(__scatter_zi.o)
+    0x08000160   0x08000160   0x00000002   Code   RO          175    .ARM.Collect$$libinit$$00000000  c_w.l(libinit.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          182    .ARM.Collect$$libinit$$00000002  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          184    .ARM.Collect$$libinit$$00000004  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          186    .ARM.Collect$$libinit$$00000006  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          189    .ARM.Collect$$libinit$$0000000C  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          191    .ARM.Collect$$libinit$$0000000E  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          193    .ARM.Collect$$libinit$$00000010  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          196    .ARM.Collect$$libinit$$00000013  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          198    .ARM.Collect$$libinit$$00000015  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          200    .ARM.Collect$$libinit$$00000017  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          202    .ARM.Collect$$libinit$$00000019  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          204    .ARM.Collect$$libinit$$0000001B  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          206    .ARM.Collect$$libinit$$0000001D  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          208    .ARM.Collect$$libinit$$0000001F  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          210    .ARM.Collect$$libinit$$00000021  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          212    .ARM.Collect$$libinit$$00000023  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          214    .ARM.Collect$$libinit$$00000025  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          216    .ARM.Collect$$libinit$$00000027  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          220    .ARM.Collect$$libinit$$0000002E  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          222    .ARM.Collect$$libinit$$00000030  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          224    .ARM.Collect$$libinit$$00000032  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000000   Code   RO          226    .ARM.Collect$$libinit$$00000034  c_w.l(libinit2.o)
+    0x08000162   0x08000162   0x00000002   Code   RO          227    .ARM.Collect$$libinit$$00000035  c_w.l(libinit2.o)
+    0x08000164   0x08000164   0x00000002   Code   RO          249    .ARM.Collect$$libshutdown$$00000000  c_w.l(libshutdown.o)
+    0x08000166   0x08000166   0x00000000   Code   RO          264    .ARM.Collect$$libshutdown$$00000002  c_w.l(libshutdown2.o)
+    0x08000166   0x08000166   0x00000000   Code   RO          266    .ARM.Collect$$libshutdown$$00000004  c_w.l(libshutdown2.o)
+    0x08000166   0x08000166   0x00000000   Code   RO          269    .ARM.Collect$$libshutdown$$00000007  c_w.l(libshutdown2.o)
+    0x08000166   0x08000166   0x00000000   Code   RO          272    .ARM.Collect$$libshutdown$$0000000A  c_w.l(libshutdown2.o)
+    0x08000166   0x08000166   0x00000000   Code   RO          274    .ARM.Collect$$libshutdown$$0000000C  c_w.l(libshutdown2.o)
+    0x08000166   0x08000166   0x00000000   Code   RO          277    .ARM.Collect$$libshutdown$$0000000F  c_w.l(libshutdown2.o)
+    0x08000166   0x08000166   0x00000002   Code   RO          278    .ARM.Collect$$libshutdown$$00000010  c_w.l(libshutdown2.o)
+    0x08000168   0x08000168   0x00000000   Code   RO          150    .ARM.Collect$$rtentry$$00000000  c_w.l(__rtentry.o)
+    0x08000168   0x08000168   0x00000000   Code   RO          152    .ARM.Collect$$rtentry$$00000002  c_w.l(__rtentry2.o)
+    0x08000168   0x08000168   0x00000006   Code   RO          164    .ARM.Collect$$rtentry$$00000004  c_w.l(__rtentry4.o)
+    0x0800016e   0x0800016e   0x00000000   Code   RO          154    .ARM.Collect$$rtentry$$00000009  c_w.l(__rtentry2.o)
+    0x0800016e   0x0800016e   0x00000004   Code   RO          155    .ARM.Collect$$rtentry$$0000000A  c_w.l(__rtentry2.o)
+    0x08000172   0x08000172   0x00000000   Code   RO          157    .ARM.Collect$$rtentry$$0000000C  c_w.l(__rtentry2.o)
+    0x08000172   0x08000172   0x00000008   Code   RO          158    .ARM.Collect$$rtentry$$0000000D  c_w.l(__rtentry2.o)
+    0x0800017a   0x0800017a   0x00000002   Code   RO          179    .ARM.Collect$$rtexit$$00000000  c_w.l(rtexit.o)
+    0x0800017c   0x0800017c   0x00000000   Code   RO          229    .ARM.Collect$$rtexit$$00000002  c_w.l(rtexit2.o)
+    0x0800017c   0x0800017c   0x00000004   Code   RO          230    .ARM.Collect$$rtexit$$00000003  c_w.l(rtexit2.o)
+    0x08000180   0x08000180   0x00000006   Code   RO          231    .ARM.Collect$$rtexit$$00000004  c_w.l(rtexit2.o)
     0x08000186   0x08000186   0x00000002   PAD
     0x08000188   0x08000188   0x00000040   Code   RO            4    .text               startup_stm32f10x_md.o
-    0x080001c8   0x080001c8   0x00001554   Code   RO           10    .text               main.o
-    0x0800171c   0x0800171c   0x00000a64   Code   RO           61    .text               stm32f10x_flash.o
-    0x08002180   0x08002180   0x000000d4   Code   RO           68    .text               delay.o
-    0x08002254   0x08002254   0x00000162   Code   RO           75    .text               dispport.o
-    0x080023b6   0x080023b6   0x00000002   PAD
-    0x080023b8   0x080023b8   0x00000b18   Code   RO           82    .text               spi_ssd1322.o
-    0x08002ed0   0x08002ed0   0x000002b6   Code   RO           94    .text               system_stm32f10x.o
-    0x08003186   0x08003186   0x00000002   PAD
-    0x08003188   0x08003188   0x00000176   Code   RO          103    .text               encoder.o
+    0x080001c8   0x080001c8   0x000016cc   Code   RO           10    .text               main.o
+    0x08001894   0x08001894   0x00000a64   Code   RO           62    .text               stm32f10x_flash.o
+    0x080022f8   0x080022f8   0x000000d4   Code   RO           69    .text               delay.o
+    0x080023cc   0x080023cc   0x00000162   Code   RO           76    .text               dispport.o
+    0x0800252e   0x0800252e   0x00000002   PAD
+    0x08002530   0x08002530   0x00000b18   Code   RO           83    .text               spi_ssd1322.o
+    0x08003048   0x08003048   0x000002b6   Code   RO           95    .text               system_stm32f10x.o
     0x080032fe   0x080032fe   0x00000002   PAD
-    0x08003300   0x08003300   0x0000010a   Code   RO          110    .text               controlport.o
-    0x0800340a   0x0800340a   0x00000002   PAD
-    0x0800340c   0x0800340c   0x000001b6   Code   RO          117    .text               uart_xmos.o
-    0x080035c2   0x080035c2   0x00000002   PAD
-    0x080035c4   0x080035c4   0x00000202   Code   RO          128    .text               ir_remote_1.o
-    0x080037c6   0x080037c6   0x00000006   Code   RO          145    .text               c_w.l(heapauxi.o)
-    0x080037cc   0x080037cc   0x0000004a   Code   RO          165    .text               c_w.l(sys_stackheap_outer.o)
-    0x08003816   0x08003816   0x00000012   Code   RO          167    .text               c_w.l(exit.o)
-    0x08003828   0x08003828   0x00000008   Code   RO          175    .text               c_w.l(libspace.o)
-    0x08003830   0x08003830   0x0000000c   Code   RO          238    .text               c_w.l(sys_exit.o)
-    0x0800383c   0x0800383c   0x00000002   Code   RO          253    .text               c_w.l(use_no_semi.o)
-    0x0800383e   0x0800383e   0x00000000   Code   RO          255    .text               c_w.l(indicate_semi.o)
-    0x0800383e   0x0800383e   0x00000010   Data   RO           97    .rodata.AHBPrescTable  system_stm32f10x.o
-    0x0800384e   0x0800384e   0x00002d80   Data   RO           84    .rodata.AsciiLib_Big  spi_ssd1322.o
-    0x080065ce   0x080065ce   0x00000be0   Data   RO           86    .rodata.AsciiLib_Small  spi_ssd1322.o
-    0x080071ae   0x080071ae   0x00000002   PAD
-    0x080071b0   0x080071b0   0x0000030c   Data   RO           12    .rodata.Font_Aleks38x24  main.o
-    0x080074bc   0x080074bc   0x00000234   Data   RO           85    .rodata.SmallFont   spi_ssd1322.o
-    0x080076f0   0x080076f0   0x00000011   Data   RO           88    .rodata.hex_chars   spi_ssd1322.o
-    0x08007701   0x08007701   0x000001a7   Data   RO           37    .rodata.str1.1      main.o
-    0x080078a8   0x080078a8   0x00000020   Data   RO          311    Region$$Table       anon$$obj.o
+    0x08003300   0x08003300   0x00000176   Code   RO          104    .text               encoder.o
+    0x08003476   0x08003476   0x00000002   PAD
+    0x08003478   0x08003478   0x0000010a   Code   RO          111    .text               controlport.o
+    0x08003582   0x08003582   0x00000002   PAD
+    0x08003584   0x08003584   0x000001b6   Code   RO          118    .text               uart_xmos.o
+    0x0800373a   0x0800373a   0x00000002   PAD
+    0x0800373c   0x0800373c   0x00000202   Code   RO          129    .text               ir_remote_1.o
+    0x0800393e   0x0800393e   0x00000006   Code   RO          146    .text               c_w.l(heapauxi.o)
+    0x08003944   0x08003944   0x0000004a   Code   RO          166    .text               c_w.l(sys_stackheap_outer.o)
+    0x0800398e   0x0800398e   0x00000012   Code   RO          168    .text               c_w.l(exit.o)
+    0x080039a0   0x080039a0   0x00000008   Code   RO          176    .text               c_w.l(libspace.o)
+    0x080039a8   0x080039a8   0x0000000c   Code   RO          239    .text               c_w.l(sys_exit.o)
+    0x080039b4   0x080039b4   0x00000002   Code   RO          254    .text               c_w.l(use_no_semi.o)
+    0x080039b6   0x080039b6   0x00000000   Code   RO          256    .text               c_w.l(indicate_semi.o)
+    0x080039b6   0x080039b6   0x00000010   Data   RO           98    .rodata.AHBPrescTable  system_stm32f10x.o
+    0x080039c6   0x080039c6   0x00002d80   Data   RO           85    .rodata.AsciiLib_Big  spi_ssd1322.o
+    0x08006746   0x08006746   0x00000be0   Data   RO           87    .rodata.AsciiLib_Small  spi_ssd1322.o
+    0x08007326   0x08007326   0x00000002   PAD
+    0x08007328   0x08007328   0x0000030c   Data   RO           12    .rodata.Font_Aleks38x24  main.o
+    0x08007634   0x08007634   0x00000234   Data   RO           86    .rodata.SmallFont   spi_ssd1322.o
+    0x08007868   0x08007868   0x00000011   Data   RO           89    .rodata.hex_chars   spi_ssd1322.o
+    0x08007879   0x08007879   0x000001a7   Data   RO           38    .rodata.str1.1      main.o
+    0x08007a20   0x08007a20   0x00000020   Data   RO          312    Region$$Table       anon$$obj.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x080078c8, Size: 0x000020b8, Max: 0x00005000, ABSOLUTE)
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08007a40, Size: 0x000020b8, Max: 0x00005000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   0x080078c8   0x00000001   Data   RW           39    .data.Process_Encoder_Rotation.input  main.o
-    0x20000001   0x080078c9   0x00000001   Data   RW           38    .data.Process_Encoder_Rotation.vol  main.o
-    0x20000002   0x080078ca   0x00000002   PAD
-    0x20000004   0x080078cc   0x00000004   Data   RW           96    .data.SystemCoreClock  system_stm32f10x.o
-    0x20000008   0x080078d0   0x00000004   Data   RW           24    .data.hall_timer_sec  main.o
-    0x2000000c   0x080078d4   0x00000004   Data   RW           26    .data.menu_timer_sec  main.o
-    0x20000010   0x080078d8   0x00000001   Data   RW           18    .data.updated       main.o
-    0x20000011   0x080078d9   0x00000001   Data   RW           29    .data.volume_val    main.o
-    0x20000012   0x080078da   0x00000006   PAD
-    0x20000018        -       0x00000060   Zero   RW          176    .bss                c_w.l(libspace.o)
-    0x20000078        -       0x00000001   Zero   RW           40    .bss.Process_Encoder_Rotation.filter  main.o
+    0x20000000   0x08007a40   0x00000001   Data   RW           40    .data.Process_Encoder_Rotation.input  main.o
+    0x20000001   0x08007a41   0x00000001   Data   RW           39    .data.Process_Encoder_Rotation.vol  main.o
+    0x20000002   0x08007a42   0x00000002   PAD
+    0x20000004   0x08007a44   0x00000004   Data   RW           97    .data.SystemCoreClock  system_stm32f10x.o
+    0x20000008   0x08007a48   0x00000001   Data   RW           37    .data.Update_Bottom_Line.last_mode  main.o
+    0x20000009   0x08007a49   0x00000003   PAD
+    0x2000000c   0x08007a4c   0x00000004   Data   RW           24    .data.hall_timer_sec  main.o
+    0x20000010   0x08007a50   0x00000004   Data   RW           26    .data.menu_timer_sec  main.o
+    0x20000014   0x08007a54   0x00000001   Data   RW           18    .data.updated       main.o
+    0x20000015   0x08007a55   0x00000001   Data   RW           29    .data.volume_val    main.o
+    0x20000016   0x08007a56   0x00000002   PAD
+    0x20000018        -       0x00000060   Zero   RW          177    .bss                c_w.l(libspace.o)
+    0x20000078        -       0x00000001   Zero   RW           41    .bss.Process_Encoder_Rotation.filter  main.o
     0x20000079        -       0x00000001   Zero   RW           32    .bss.balance_val    main.o
-    0x2000007a        -       0x00000001   Zero   RW          122    .bss.buffer_index   uart_xmos.o
+    0x2000007a        -       0x00000001   Zero   RW          123    .bss.buffer_index   uart_xmos.o
     0x2000007b        -       0x00000001   Zero   RW           35    .bss.button_pressed  main.o
     0x2000007c        -       0x00000002   Zero   RW           34    .bss.button_tick    main.o
-    0x2000007e        -       0x00000001   Zero   RW           42    .bss.dig_flt        main.o
-    0x2000007f        -       0x00000001   Zero   RW           41    .bss.enc_direction  main.o
+    0x2000007e        -       0x00000001   Zero   RW           43    .bss.dig_flt        main.o
+    0x2000007f        -       0x00000001   Zero   RW           42    .bss.enc_direction  main.o
     0x20000080        -       0x00000001   Zero   RW           31    .bss.filter_val     main.o
-    0x20000081   0x080078da   0x00000003   PAD
+    0x20000081   0x08007a56   0x00000003   PAD
     0x20000084        -       0x00000004   Zero   RW           23    .bss.halt_counter   main.o
-    0x20000088        -       0x00000002   Zero   RW          135    .bss.hold_counter   ir_remote_1.o
-    0x2000008a        -       0x00000001   Zero   RW           43    .bss.input_select   main.o
+    0x20000088        -       0x00000002   Zero   RW          136    .bss.hold_counter   ir_remote_1.o
+    0x2000008a        -       0x00000001   Zero   RW           44    .bss.input_select   main.o
     0x2000008b        -       0x00000001   Zero   RW           30    .bss.input_val      main.o
-    0x2000008c        -       0x00000001   Zero   RW          132    .bss.ir_bit_count   ir_remote_1.o
-    0x2000008d   0x080078da   0x00000003   PAD
-    0x20000090        -       0x00000004   Zero   RW          133    .bss.ir_current_packet  ir_remote_1.o
+    0x2000008c        -       0x00000001   Zero   RW          133    .bss.ir_bit_count   ir_remote_1.o
+    0x2000008d   0x08007a56   0x00000003   PAD
+    0x20000090        -       0x00000004   Zero   RW          134    .bss.ir_current_packet  ir_remote_1.o
     0x20000094        -       0x00000001   Zero   RW           21    .bss.ir_data_received  main.o
-    0x20000095   0x080078da   0x00000001   PAD
+    0x20000095   0x08007a56   0x00000001   PAD
     0x20000096        -       0x00000002   Zero   RW           16    .bss.ir_last_tick   main.o
-    0x20000098        -       0x00000001   Zero   RW          134    .bss.ir_packet_ready  ir_remote_1.o
-    0x20000099        -       0x00000004   Zero   RW          136    .bss.ir_rx_buffer   ir_remote_1.o
-    0x2000009d        -       0x00000001   Zero   RW          131    .bss.ir_state       ir_remote_1.o
-    0x2000009e        -       0x00000001   Zero   RW          120    .bss.last_signal    uart_xmos.o
-    0x2000009f   0x080078da   0x00000001   PAD
+    0x20000098        -       0x00000001   Zero   RW          135    .bss.ir_packet_ready  ir_remote_1.o
+    0x20000099        -       0x00000004   Zero   RW          137    .bss.ir_rx_buffer   ir_remote_1.o
+    0x2000009d        -       0x00000001   Zero   RW          132    .bss.ir_state       ir_remote_1.o
+    0x2000009e        -       0x00000001   Zero   RW          121    .bss.last_signal    uart_xmos.o
+    0x2000009f   0x08007a56   0x00000001   PAD
     0x200000a0        -       0x00000004   Zero   RW           25    .bss.menu_counter   main.o
     0x200000a4        -       0x00000001   Zero   RW           17    .bss.menu_level     main.o
     0x200000a5        -       0x00000001   Zero   RW           28    .bss.menu_mode_val  main.o
     0x200000a6        -       0x00000001   Zero   RW           13    .bss.menu_need_update  main.o
     0x200000a7        -       0x00000001   Zero   RW           19    .bss.mute_state     main.o
-    0x200000a8        -       0x00000001   Zero   RW          119    .bss.new_signal_received  uart_xmos.o
-    0x200000a9        -       0x00001000   Zero   RW           87    .bss.oled_buffer    spi_ssd1322.o
+    0x200000a8        -       0x00000001   Zero   RW          120    .bss.new_signal_received  uart_xmos.o
+    0x200000a9        -       0x00001000   Zero   RW           88    .bss.oled_buffer    spi_ssd1322.o
     0x200010a9        -       0x00000008   Zero   RW           36    .bss.preset         main.o
-    0x200010b1        -       0x00000003   Zero   RW          121    .bss.rx_buffer      uart_xmos.o
-    0x200010b4   0x080078da   0x00000004   PAD
+    0x200010b1        -       0x00000003   Zero   RW          122    .bss.rx_buffer      uart_xmos.o
+    0x200010b4   0x08007a56   0x00000004   PAD
     0x200010b8        -       0x00000800   Zero   RW            2    HEAP                startup_stm32f10x_md.o
     0x200018b8        -       0x00000800   Zero   RW            1    STACK               startup_stm32f10x_md.o
 
@@ -882,7 +887,7 @@ Image component sizes
        354          0          0          0          0       2017   dispport.o
        374          0          0          0          0       4743   encoder.o
        514          0          0          0         13       2400   ir_remote_1.o
-      5460         50       1203         12         33      11645   main.o
+      5836         50       1203         13         33      11826   main.o
       2840          0      15269          0       4096       7314   spi_ssd1322.o
         64         26        236          0       4096        888   startup_stm32f10x_md.o
       2660          0          0          0          0       6338   stm32f10x_flash.o
@@ -890,9 +895,9 @@ Image component sizes
        438          0          0          0          6       4332   uart_xmos.o
 
     ----------------------------------------------------------------------
-     13886         76      16758         20       8260      45592   Object Totals
+     14262         76      16758         24       8256      45773   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-        10          0          2          4         16          0   (incl. Padding)
+        10          0          2          7         12          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -939,15 +944,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     14162         92      16758         20       8356      45888   Grand Totals
-     14162         92      16758         20       8356      45888   ELF Image Totals
-     14162         92      16758         20          0          0   ROM Totals
+     14538         92      16758         24       8352      46069   Grand Totals
+     14538         92      16758         24       8352      46069   ELF Image Totals
+     14538         92      16758         24          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                30920 (  30.20kB)
+    Total RO  Size (Code + RO Data)                31296 (  30.56kB)
     Total RW  Size (RW Data + ZI Data)              8376 (   8.18kB)
-    Total ROM Size (Code + RO Data + RW Data)      30940 (  30.21kB)
+    Total ROM Size (Code + RO Data + RW Data)      31320 (  30.59kB)
 
 ==============================================================================
 
