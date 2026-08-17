@@ -28,11 +28,15 @@ Project File Date:  08/17/2026
 *** Using Compiler 'V6.19', folder: 'E:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'Target 1'
 Note: source file '.\IR_REMOTE\ir_remote.c' - object file renamed from '.\Objects\ir_remote.o' to '.\Objects\ir_remote_1.o'.
+main/main.c(840): warning: result of comparison of constant 147 with expression of type 'int8_t' (aka 'signed char') is always true [-Wtautological-constant-out-of-range-compare]
+                    if (balance_val < 147) balance_val++;
+                        ~~~~~~~~~~~ ^ ~~~
+1 warning generated.
 compiling main.c...
 linking...
-Program Size: Code=20832 RO-data=17208 RW-data=20 ZI-data=8356  
+Program Size: Code=21024 RO-data=17208 RW-data=20 ZI-data=8356  
 FromELF: creating hex file...
-".\Objects\SSD1322_Amanero.axf" - 0 Error(s), 0 Warning(s).
+".\Objects\SSD1322_Amanero.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -55,7 +59,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.6.0
-Build Time Elapsed:  00:00:00
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>

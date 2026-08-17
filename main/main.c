@@ -303,7 +303,7 @@ void Process_Encoder_Rotation(uint8_t direction) {
 //Update_Bottom_Line();																					//rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrIRrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
 }
 
-//===================================== J S A PRESS ENC =================================================================
+//===================================== J S A PRESS BUTTON (ENC) =================================================================
 void ProcessButtonPress(void) {
     // Если звук выключен (Mute) — включаем
     if (mute_state) {
@@ -821,7 +821,58 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
         Update_Bottom_Line(); // Спокойно и не спеша шлём данные в SPI в фоне!
 
         ProcessButtonPress();
-				// ====================================================================
+				 // ====================================================================
+        // ОБРАБОТКА ВРАЩЕНИЯ ЭНКОДЕРА С УЧЁТОМ РЕЖИМА МЕНЮ
+        // ====================================================================
+        if (TIM3->CNT > last_encoder_value) {
+            // ---- Крутанули ВПРАВО ----
+            switch (menu_mode_val) {
+                case 0: // Режим Громкости
+                    if (volume_val < 255) volume_val++;
+                    break;
+                case 1: // Режим Входа
+                    if (input_val < 2) input_val++; // Всего 3 входа: 0, 1, 2
+                    break;
+                case 2: // Режим Фильтра
+                    if (filter_val < 7) filter_val++; // Например, 8 фильтров ЦАПа
+                    break;
+                case 3: // Режим Баланса
+                    if (balance_val < 147) balance_val++;
+                    break;
+            }
+            
+            // Заглушенная отправка в ЦАП (пока не трогаем, ждём I2C)
+            // Set_Volume_And_Balance(volume_val, balance_val); 
+            
+            menu_need_update = 1; // Взводим флаг отрисовки экрана
+            last_encoder_value = TIM3->CNT;
+        }
+        else if (TIM3->CNT < last_encoder_value) {
+            // ---- Крутанули ВЛЕВО ----
+            switch (menu_mode_val) {
+                case 0: // Режим Громкости
+                    if (volume_val > 0) volume_val--;
+                    break;
+                case 1: // Режим Входа
+                    if (input_val > 0) input_val--;
+                    break;
+                case 2: // Режим Фильтра
+                    if (filter_val > 0) filter_val--;
+                    break;
+                case 3: // Режим Баланса
+                    if (balance_val > 0) balance_val--;
+                    break;
+            }
+            
+            // Заглушенная отправка в ЦАП (пока не трогаем, ждём I2C)
+            // Set_Volume_And_Balance(volume_val, balance_val); 
+            
+            menu_need_update = 1; // Взводим флаг отрисовки экрана
+            last_encoder_value = TIM3->CNT;
+        }
+
+					
+			/*		// ====================================================================
         // ОБРАБОТКА ЭНКОДЕРА ГРОМКОСТИ ПРЯМЫМ ХОДОМ
         // ====================================================================
         if (TIM3->CNT > last_encoder_value) {
@@ -839,7 +890,7 @@ uint16_t last_encoder_value = 0; // Наш эталон для сравнения ручки
             Set_Volume_And_Balance(volume_val, balance_val); // Пуляем в ЦАП!
             menu_need_update = 1;
             last_encoder_value = TIM3->CNT;
-        }
+        }*/
 
 					// ====================================================================
         // 1. АППАРАТНЫЙ ТАЙМАУТ ОТПУСКАНИЯ КНОПКИ ПУЛЬТА (0.2 сек = 2000 тиков)
