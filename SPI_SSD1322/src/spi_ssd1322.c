@@ -317,41 +317,64 @@ void SSD1322_DrawString(uint16_t x, uint16_t y, uint8_t font_type, uint8_t *pStr
     }
 }
 
-/* ============================================================
-   7.  ВЫВОД МАЛЕНЬКОГО ШРИФТА (6x8)
-   ============================================================ */
 
-/*
-  * @brief  Вывод одного маленького символа
-  */
-void SSD1322_DrawSmallChar(uint8_t x, uint8_t y, uint8_t c) {
-    if (c < 0x20 || c > 0x7E) c = 0x20;
 
-    SSD1322_CommandWrite(0x15);
-    SSD1322_DataWrite(x);
-    SSD1322_DataWrite(x + 5);
-
-    SSD1322_CommandWrite(0x75);
-    SSD1322_DataWrite(y);
-    SSD1322_DataWrite(y + 7);
-
-    SSD1322_CommandWrite(0x5C);
-
-    for (int row = 0; row < 8; row++) {
-        SSD1322_DataWrite(SmallFont[c - 0x20][row]);
-    }
-}
-
-/**
-  * @brief  Вывод строки маленьким шрифтом
-  */
+// ============================================================================
+// 7. ВЫВОД МАЛЕНЬКОГО ШРИФТА (6x8) С ИДЕАЛЬНОЙ СИНХРОНИЗАЦИЕЙ СТРОК ДИСПЛЕЯ
+// ============================================================================
 void SSD1322_DrawSmallString(uint8_t x, uint8_t y, const char *str) {
+	// --- НАША ЧЕСТНАЯ ИНЖЕНЕРНАЯ ПОПРАВКА НА СМЕЩЕНИЕ СТЕКЛА ---
+    // Теперь X = 0 на входе автоматически превратится в X = 27 для чипа,
+    // и первая буква ровно вылезет из-за левого края экрана!
+    x += 27; 
     while (*str) {
         SSD1322_DrawSmallChar(x, y, *str);
-        x += 6;
+        x += 2;			//Сдвиг между символами
         str++;
     }
 }
+
+void SSD1322_DrawSmallChar(uint8_t x, uint8_t y, uint8_t c) {
+    if (c < 0x20 || c > 0x7E) c = 0x20;
+			uint8_t small_font_brightness = 0x09; // Значение от 0x01 (едва видно) до 0x0F (максимум)
+
+    // 1. ОТКРЫВАЕМ ОКНО СТРОГО В 8 ПИКСЕЛЕЙ ШИРИНЫ (2 сегмента памяти)
+    SSD1322_CommandWrite(0x15); 
+    SSD1322_DataWrite(x);
+    SSD1322_DataWrite(x + 1); // Зажимаем окно! 2 сегмента * 4 пикселя = ровно 8 точек в ширину!
+
+    SSD1322_CommandWrite(0x75); 
+    SSD1322_DataWrite(y);
+    SSD1322_DataWrite(y + 7); // Высота строго 8 строк буквы
+
+    SSD1322_CommandWrite(0x5C); // Команда начала заливки памяти
+
+    // 2. Бежим по 8 горизонтальным строкам буквы (сверху вниз)
+    for (int row = 0; row < 8; row++) 
+    {
+        // Выплевываем ровно 3 байта живых пикселей нашей буквы (6 штук)
+        for (int p_pair = 0; p_pair < 3; p_pair++) 
+        {
+            uint8_t bit1 = (SmallFont[c - 0x20][p_pair * 2] >> row) & 0x01;
+            uint8_t bit2 = (SmallFont[c - 0x20][p_pair * 2 + 1] >> row) & 0x01;
+
+					// Формируем нибблы динамически в зависимости от нужной яркости
+						uint8_t pix1 = bit1 ? (small_font_brightness << 4) : 0x00; // Сдвигаем яркость в старший ниббл
+						uint8_t pix2 = bit2 ? (small_font_brightness & 0x0F) : 0x00; // Оставляем в младшем ниббле
+
+/*
+            uint8_t pix1 = bit1 ? 0xF0 : 0x00; 
+            uint8_t pix2 = bit2 ? 0x0F : 0x00; 
+*/
+            uint8_t ssd_byte = pix1 | pix2;
+            SSD1322_DataWrite(ssd_byte);
+        }
+        SSD1322_DataWrite(0x00);
+    }
+}
+/**
+  * @brief  Вывод строки маленьким шрифтом
+  */
 
 	/**
   * @brief  Рисует символ в буфере (6x8) из SmallFont с инверсией битов

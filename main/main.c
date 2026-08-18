@@ -266,7 +266,7 @@ void Update_Bottom_Line(void) {
             // 1. Выводим префикс громкости напрямую
 						//SSD1322_ClearRAM();
             SSD1322_DrawString(0, 20, 0, (unsigned char*)"Volume");
-            
+            SSD1322_DrawSmallString(30, 56, "DSD256");						//        TEST FONT X, Y(56(56+8=64))
             // 2. Быстро разбиваем байт громкости на три символа-цифры
             unsigned char vol_str[4];
             //vol_str[0] = (volume_val / 100) + '0';       // Сотни
@@ -871,7 +871,7 @@ void 	SSD1322_DrawAleksFull(uint8_t start_col_addr, uint8_t start_row, uint16_t 
 			SSD1322_DataWrite(0x00);																			// Это гарантирует, что контроллер ровно закроет "шаг" адресации
 		}
 	}
-
+			//SSD1322_DrawSmallString(28, 35, "SERGEY888");						//        TEST FONT
 			delay_ms(time);																								//Заставка держится 1 секунду
 			SSD1322_ClearRAM();
 }
@@ -936,7 +936,7 @@ int main(void) {
         // Если чистая — прописываем её дефолтными значениями в шагах крутилки
         preset.input_select = 0;   // USB вход при первом старте
         preset.digital_filter = 0; // 0-й фильтр
-        preset.contrast = 0x1F;    // Яркость OLED экрана
+        preset.contrast = 0x2F;    // Яркость OLED экрана
         preset.volume_int = 80;    // Стартовые 80 шагов громкости
         preset.balance_int = 127;  // Баланс ровно по центру (127 из 255)
         
