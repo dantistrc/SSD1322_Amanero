@@ -120,6 +120,8 @@ uint8_t input_val = 0;   // Стартовый вход (0-USB, 1-COA, 2-OPT)
 uint8_t filter_val = 0;  // Стартовый фильтр ЦАПа
 uint8_t  balance_val = 0; // Стартовый баланс (ноль — центр)
 static uint8_t mute_flag = 0; // Помнит состояние кнопки Муте
+uint32_t screen_return_timer = 0;
+
 /* ============================================================
    3.  ВСПОМОГАТЕЛЬНЫЕ БУФЕРЫ
    ============================================================ */
@@ -686,9 +688,8 @@ void ESS9028_SetFilter(uint8_t filter_num) {
 
 //*/===========================Переключение логики входов (Регистр 1)=================================================
 
-void ESS9028_SetInput(uint8_t input_num) {
+void ESS9039_SetInput(uint8_t input_num) {
     uint8_t reg_val = 0;
-    
     switch (input_num) {
         case 1: 
             // Вход 1: USB / Amanero (Режим Serial/I2S)
@@ -758,17 +759,19 @@ void ESS9028_SetInput(uint8_t input_num) {
   * @param  None
   * @retval None
   */
-void MUTED_LCD(void) {
+/*void MUTED_LCD(void) {
     if (!updated) { updated = 1; SSD1322_ClearRAM(); }
     delay_ms(50);
     SSD1322_DrawString(0, 5, 0, (unsigned char*)"DAC IS  MUTED");
-}
-
-/**
+}*//**
   * @brief  Настройка IR-приёмника на PB5 (EXTI, подтяжка, прерывание)
   * @param  None
   * @retval None
   */
+
+
+
+
 
 // =================IR-REMOTE====================================================================================================================================================
 //-------------------------------------------
@@ -797,30 +800,34 @@ void Process_IR_Command(uint32_t ir_code) {
             if (volume_val > 0) volume_val = volume_val - 2;
             menu_need_update = 1;
             break;
-         case 0x5D: // MUTE
+        case 0x5D: // MUTE
             mute_flag = !mute_flag; // Переключаем флаг при каждом нажатии (0 превратится в 1, а 1 в 0)
 						Set_DAC_Mute(mute_flag); // Дергаем нашу новую функцию --------MUTE--------- + DISP
             menu_need_update = 1;
             break;
-        case 0x07: // BALANCE>R
-            if (balance_val < 177) balance_val++;// Сдвиг в правый канал
+				case 0x07: // BALANCE>R
+            if (balance_val < 177) balance_val++;
+            menu_mode_val = 3;     // Принудительно включаем экран БАЛАНСА
             menu_need_update = 1;
+						menu_counter = 1;      // Включаем встроенные часы!
             break;
-				case 0x08: // BALANCE<L
-            if (balance_val > 77) balance_val--;// Сдвиг в левый канал
+            
+        case 0x08: // BALANCE<L
+            if (balance_val > 77) balance_val--;
+            menu_mode_val = 3;     // Принудительно включаем экран БАЛАНСА
             menu_need_update = 1;
-						//Сюда вставить флаг, отобразить "баланс"  +1 сек
+            menu_counter = 1;      // Включаем встроенные часы!
             break;
+
 				case 0x02: // INPUT 
             input_val = (input_val + 1) % 3; // Крутим по кругу: USB -> COA -> OPT
             menu_need_update = 1;
             break;
 				case 0x5E: // FILTRE++
-						filter_val = (filter_val + 1) % 8; // Крутим по кругу: USB -> COA -> OPT
+						filter_val = (filter_val + 1) % 8; // Крутим фильтры: 0 -> 7 -> 0
             menu_need_update = 1;
             break;
     }
-						ir_packet_ready = 0;
 }  
 //
     
@@ -844,24 +851,24 @@ void Process_IR_Command(uint32_t ir_code) {
 // ============================================================
 //   ВЫВОД ВСЕЙ НАДПИСИ "ALEKS" ПОСТРОЧНО С ВЫРАВНИВАНИЕМ
 // ============================================================
-void SSD1322_DrawAleksFull(uint8_t start_col_addr, uint8_t start_row, uint16_t time) {	// X,Y,time
+void 	SSD1322_DrawAleksFull(uint8_t start_col_addr, uint8_t start_row, uint16_t time) {	// X,Y,time
 			SSD1322_CommandWrite(0x15);
-			SSD1322_DataWrite(start_col_addr);           // Начало (например, 0x1C)
-			SSD1322_DataWrite(start_col_addr + 50 - 1);  // Конец окна
+			SSD1322_DataWrite(start_col_addr);           									// Начало (например, 0x1C)
+			SSD1322_DataWrite(start_col_addr + 50 - 1);  									// Конец окна
 			SSD1322_CommandWrite(0x75);
 			SSD1322_DataWrite(start_row);
-			SSD1322_DataWrite(start_row + 24 - 1);       // Высота шрифта
-			SSD1322_CommandWrite(0x5C); // Начинаем лить данные в RAM
+			SSD1322_DataWrite(start_row + 24 - 1);       									// Высота шрифта
+			SSD1322_CommandWrite(0x5C); 																	// Начинаем лить данные в RAM
 			for (uint8_t row = 0; row < 24; row++) {											// Проходим по всем 5 буквам слова "ALEKS"200 пикселей / 4 = 50 единиц адресации столбцов.
 			for (uint8_t ch = 0; ch < 5; ch++) {													// Указатель на начало текущей буквы (шаг 38 колонок) 5 букв по 40 пикселей (38 + 2 пустых) = 200 пикселей.
 			const uint32_t *char_ptr = &Font_Aleks38x24[(ch * 39) + 1];		//const uint32_t *char_ptr = &Font_Aleks38x24[ch * 38];// Выводим 19 байт (38 пикселей) текущей буквы
 			for (uint8_t b = 0; b < 19; b++) {
-			uint8_t out_byte = 0x00;		// Проверяем бит в вертикальной колонке массива	
-				if (char_ptr[b * 2]     & (1UL << row)) out_byte |= 0xF0;		// Если буква смещена на 1 пиксель, используй (1UL << (row + 1))
-				if (char_ptr[b * 2 + 1] & (1UL << row)) out_byte |= 0x0F;
-				SSD1322_DataWrite(out_byte);																// ДОБИВКА: 20-й пустой байт (2 пикселя), чтобы буква стала кратна 4
+			uint8_t out_byte = 0x00;		                          				// Проверяем бит в вертикальной колонке массива	
+			if (char_ptr[b * 2]     & (1UL << row)) out_byte |= 0xF0;			// Если буква смещена на 1 пиксель, используй (1UL << (row + 1))
+			if (char_ptr[b * 2 + 1] & (1UL << row)) out_byte |= 0x0F;
+			SSD1322_DataWrite(out_byte);																	// ДОБИВКА: 20-й пустой байт (2 пикселя), чтобы буква стала кратна 4
 }
-				SSD1322_DataWrite(0x00);																		// Это гарантирует, что контроллер ровно закроет "шаг" адресации
+			SSD1322_DataWrite(0x00);																			// Это гарантирует, что контроллер ровно закроет "шаг" адресации
 		}
 	}
 
@@ -875,7 +882,7 @@ void SSD1322_DrawAleksFull(uint8_t start_col_addr, uint8_t start_row, uint16_t t
 
 
 void IR_Init(void) {
-	// ============================================================
+// ============================================================
 // ИСПРАВЛЕННАЯ ИНИЦИАЛИЗАЦИЯ ИК-ПОРТА И ТАЙМЕРА TIM3
 // ============================================================
 
@@ -899,10 +906,10 @@ void IR_Init(void) {
     NVIC_SetPriority(EXTI9_5_IRQn, 1);
 
     // 3. НАСТРОЙКА ТАЙМЕРА TIM3 ДЛЯ ЗАМЕРА ВРЕМЕНИ
-    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;      // включаем тактирование TIM3
+    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;        // включаем тактирование TIM3
     TIM3->PSC = 719;                           // предделитель 719 (шаг 10 мкс)
-    TIM3->ARR = 0xFFFF;                  // максимум (16 бит)
-    TIM3->CR1 |= TIM_CR1_CEN;                // запускаем счёт
+    TIM3->ARR = 0xFFFF;                        // максимум (16 бит)
+    TIM3->CR1 |= TIM_CR1_CEN;                  // запускаем счёт
 }
 
 
@@ -916,13 +923,15 @@ void IR_Init(void) {
   * @param  None
   * @retval int (не используется)
   */
-int main(void) {			//******************************************************************************************************** M A I N *************************
-	//==========================================================================================
-	// ====================================================================
-    // ИНИЦИАЛИЗАЦИЯ ПАМЯТИ: ПРОВЕРЯЕМ СТАТУС, ЧИТАЕМ И РАЗДАЕМ ПАРАМЕТРЫ
-    // ====================================================================
+
+	//******************************************************************************************************** M A I N ************************************************************************
+int main(void) {		
+
+// ====================================================================
+// ИНИЦИАЛИЗАЦИЯ ПАМЯТИ: ПРОВЕРЯЕМ СТАТУС, ЧИТАЕМ И РАЗДАЕМ ПАРАМЕТРЫ
+// ====================================================================
     
-    // Шаг 1: Проверяем напрямую первое слово во флешке — чистая она или уже Рабочая?
+    //  первое слово во флешке — чистая она или уже Рабочая?
     if (*(__IO uint32_t*)FLASH_PRESET_ADDR == 0xFFFFFFFF) {
         // Если чистая — прописываем её дефолтными значениями в шагах крутилки
         preset.input_select = 0;   // USB вход при первом старте
@@ -934,10 +943,10 @@ int main(void) {			//***********************************************************
         FLASH_WriteSettings();     // Сохраняем эту базу в подвал
     }
 
-    // Шаг 2: Теперь гарантированно считываем рабочие данные из флешки на полку структуры
+    //  считываем рабочие данные из флешки на полку структуры
     FLASH_ReadSettings();
 
-    // Шаг 3: Присваиваем значения из структуры в рабочие переменные твоей крутилки
+    // Присваиваем значения из структуры в рабочие переменные  крутилки
     input_val   = preset.input_select;
     filter_val  = preset.digital_filter;
     volume_val  = preset.volume_int;
@@ -1021,10 +1030,24 @@ SSD1322_DrawString(0, 0, 1,(unsigned char*)"USB PCM 768 ");
         menu_need_update = 0; // Сбрасываем флаг
         Update_Bottom_Line(); // Спокойно и не спеша шлём данные в SPI в фоне!
 				}	
-				if (ir_packet_ready) {
-						 Process_IR_Command(ir_rx_buffer[2]);      
+				if 	(ir_packet_ready) {
+						static uint8_t global_ir_divider = 0;
+            ir_packet_ready = 0; // Сразу сбрасываем флаг прерывания
+					  global_ir_divider = !global_ir_divider; // Переключаем 0 -> 1 -> 0 -> 1
+            if (global_ir_divider == 1) 
+            {
+						Process_IR_Command(ir_rx_buffer[2]); 
+						}					
 				}
-	
+	        // Сторож автовозврата экрана на главный
+        if (menu_counter >= 3 && menu_mode_val == 3) 
+        {
+            menu_mode_val = 0;    // Сбрасываем экран на ГРОМКОСТЬ
+            menu_need_update = 1; // Машем флажком перерисовки
+            menu_counter = 0;     // Останавливаем и обнуляем часы
+        }
+
+
 /*/ ============================================================
 
 
@@ -1037,12 +1060,8 @@ SSD1322_DrawString(0, 0, 1,(unsigned char*)"USB PCM 768 ");
                 hold_counter = 0; //СБРОС: Палец с пульта убрали!
             }
         }
-		
-
-				
 				Set_Volume_And_Balance(volume_val, balance_val);			//  ОТПРАВКА НАСТРОЕК ЗВУКА В РЕГИСТРЫ ЦАП       
     }
-		
 		*/
 	}
 }
