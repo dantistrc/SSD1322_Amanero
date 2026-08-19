@@ -32,6 +32,7 @@ volatile uint8_t ir_need_update = 0;   // А этот флаг крутит ТОЛЬКО верхний выво
 volatile uint32_t ir_timeout_ms = 0; // Часы времени от последнего чиха пульта
 volatile uint16_t ir_last_tick = 0; // Время последнего импульса пульта
 void Set_Volume_And_Balance(uint8_t volume_val, uint8_t balance_val);
+static uint8_t last_mute = 255; // Черновик: помнит состояние Mute в прошлом круге
 
 
 /* ============================================================
@@ -81,7 +82,7 @@ volatile uint16_t ir_code = 0;
 
 unsigned int halt_counter = 0;
 unsigned int hall_timer_sec = 300;
-unsigned int menu_counter = 0;
+uint16_t menu_counter = 0;
 unsigned int menu_timer_sec = 2100;
 unsigned int contrast;
 uint8_t remote_packet[4];
@@ -252,10 +253,13 @@ void Update_Bottom_Line(void) {
 					static uint8_t last_mode = 255; 
     
 					// Если режим изменился — только тогда чистим экран один раз!
-					if (menu_mode_val != last_mode) {
-					SSD1322_ClearRAM();
-					last_mode = menu_mode_val; // Запоминаем новый режим
-					}
+					    // Если изменился режим ИЛИ изменилось состояние Mute — только тогда чистим экран один раз!
+				if (menu_mode_val != last_mode || mute_flag != last_mute) {
+        SSD1322_ClearRAM();
+        last_mode = menu_mode_val;   // Запоминаем новый режим
+        last_mute = mute_flag;       // Запоминаем новое состояние Mute
+    }
+
 
         switch (menu_mode_val) {
         //case 0: // MODE_VOLUME
@@ -265,8 +269,17 @@ void Update_Bottom_Line(void) {
 				case 0: // MODE_VOLUME
             // 1. Выводим префикс громкости напрямую
 						//SSD1322_ClearRAM();
-            SSD1322_DrawString(0, 20, 0, (unsigned char*)"Volume");
-            SSD1322_DrawSmallString(30, 56, "DSD256");						//        TEST FONT X, Y(56(56+8=64))
+				    // 1. Выводим префикс режима на экран
+						if (mute_flag == 1) {
+								// Если звук выключен — пишем MUTE в те же координаты, перекрывая громкость!
+								SSD1322_DrawString(0, 20, 0, (unsigned char*)"  MUTE"); 
+						} else {
+								// Если всё штатно — пишем стандартный VOLUME
+								SSD1322_DrawString(0, 20, 0, (unsigned char*)"VOLUME");
+						}
+
+            //SSD1322_DrawString(0, 20, 0, (unsigned char*)"VOLUME");
+            //SSD1322_DrawSmallString(30, 56, "DSD256");						//        TEST FONT X, Y(56(56+8=64))    MICRO_FONT_SAMPLE
             // 2. Быстро разбиваем байт громкости на три символа-цифры
             unsigned char vol_str[4];
             //vol_str[0] = (volume_val / 100) + '0';       // Сотни
@@ -297,47 +310,57 @@ void Update_Bottom_Line(void) {
             // 4. Дописываем единицы измерения (сдвигаемся по X на 64 пикселя вправо)
             SSD1322_DrawString(45, 20, 0, (unsigned char*)"dB");
             // mini Выводим реальный вход в зависимости от input_val
-            if (input_val == 0)      SSD1322_DrawString(0, 0, 1, (unsigned char*)"USB ");
-						else if (input_val == 1) SSD1322_DrawString(0, 0, 1, (unsigned char*)"COA ");
-						else                     SSD1322_DrawString(0, 0, 1, (unsigned char*)"OPT ");
-						//  mini Выводим красивое название фильтра ESS9039
-            if (filter_val == 0)      SSD1322_DrawString(0, 45, 1, (unsigned char*)"MinPh"); // Minimum phase (default)
-            else if (filter_val == 1) SSD1322_DrawString(0, 45, 1, (unsigned char*)"LinAp"); // Linear phase apodizing fast roll-off
-            else if (filter_val == 2) SSD1322_DrawString(0, 45, 1, (unsigned char*)"LinFt"); // Linear phase fast roll-off
-            else if (filter_val == 3) SSD1322_DrawString(0, 45, 1, (unsigned char*)"LinLo"); // Linear phase fast roll-off low ripple
-            else if (filter_val == 4) SSD1322_DrawString(0, 45, 1, (unsigned char*)"LinSl"); // Linear phase slow roll-off
-            else if (filter_val == 5) SSD1322_DrawString(0, 45, 1, (unsigned char*)"MinFa"); // Minimum phase fast roll-off
-            else if (filter_val == 6) SSD1322_DrawString(0, 45, 1, (unsigned char*)"MinSl"); // Minimum phase slow roll-off
-            else                      SSD1322_DrawString(0, 45, 1, (unsigned char*)"MinLo"); // Minimum phase slow roll-off low dispersion
+            if (input_val == 0)      SSD1322_DrawSmallString(1, 56,"INPUT USB     ");
+						else if (input_val == 1) SSD1322_DrawSmallString(1, 56,"INPUT S/PDIF  ");
+						else                     SSD1322_DrawSmallString(1, 56,"INPUT TOSLINK ");
+						//  mini Выводим красивое название фильтра ESS9039 // SSD1322_DrawSmallString(37, 0,
+								 if (filter_val == 0) SSD1322_DrawSmallString(1, 0,"FIR1 MinPhase"); // Minimum phase (default)
+            else if (filter_val == 1) SSD1322_DrawSmallString(1, 0,"FIR2 LinApod"); // Linear phase apodizing fast roll-off
+            else if (filter_val == 2) SSD1322_DrawSmallString(1, 0,"FIR3 LinFast"); // Linear phase fast roll-off
+            else if (filter_val == 3) SSD1322_DrawSmallString(1, 0,"FIR4 LinLowR"); // Linear phase fast roll-off low ripple
+            else if (filter_val == 4) SSD1322_DrawSmallString(1, 0,"FIR5 LinSlow"); // Linear phase slow roll-off
+            else if (filter_val == 5) SSD1322_DrawSmallString(1, 0,"FIR6 MinFast"); // Minimum phase fast roll-off
+            else if (filter_val == 6) SSD1322_DrawSmallString(1, 0,"FIR7 MinSlow"); // Minimum phase slow roll-off
+            else                      SSD1322_DrawSmallString(1, 0,"FIR8 MinLowD"); // Minimum phase slow roll-off low dispersion
 						break;
-				
+				          /* if (filter_val == 0)      SSD1322_DrawString(0, 45, 1, (unsigned char*)"Min Phase"); // Minimum phase (default)
+            else if (filter_val == 1) SSD1322_DrawString(0, 45, 1, (unsigned char*)"Lin Apod"); // Linear phase apodizing fast roll-off
+            else if (filter_val == 2) SSD1322_DrawString(0, 45, 1, (unsigned char*)"Lin Fast"); // Linear phase fast roll-off
+            else if (filter_val == 3) SSD1322_DrawString(0, 45, 1, (unsigned char*)"Lin LowR"); // Linear phase fast roll-off low ripple
+            else if (filter_val == 4) SSD1322_DrawString(0, 45, 1, (unsigned char*)"Lin Slow"); // Linear phase slow roll-off
+            else if (filter_val == 5) SSD1322_DrawString(0, 45, 1, (unsigned char*)"Min Fast"); // Minimum phase fast roll-off
+            else if (filter_val == 6) SSD1322_DrawString(0, 45, 1, (unsigned char*)"Min Slow"); // Minimum phase slow roll-off
+            else                      SSD1322_DrawString(0, 45, 1, (unsigned char*)"Min LowD"); // Minimum phase slow roll-off low dispersion
+						break;*/
 				
         case 1: // MODE_INPUT
 						//SSD1322_ClearRAM();
+																			SSD1322_DrawString(19, 0, 0, (unsigned char*)"INPUT");
             // Выводим реальный вход в зависимости от input_val
-            if (input_val == 0)      SSD1322_DrawString(80, 20, 0, (unsigned char*)"USB ");
-						else if (input_val == 1) SSD1322_DrawString(80, 20, 0, (unsigned char*)"COA ");
-						else                     SSD1322_DrawString(80, 20, 0, (unsigned char*)"OPT ");
+            if (input_val == 0)      SSD1322_DrawString(80, 32, 0, (unsigned char*)"  USB  ");
+						else if (input_val == 1) SSD1322_DrawString(80, 33, 0, (unsigned char*)"S/PDIF");
+						else                     SSD1322_DrawString(80, 32, 0, (unsigned char*)"TOSLINK");
 
             break;
             
         case 2: // MODE_FILTER
 						//SSD1322_ClearRAM();
             // Выводим красивое название фильтра ESS9039
-            if (filter_val == 0)      SSD1322_DrawString(0, 25, 1, (unsigned char*)"1Min Phase"); // Minimum phase (default)
-            else if (filter_val == 1) SSD1322_DrawString(0, 25, 1, (unsigned char*)"2Lin Apod "); // Linear phase apodizing fast roll-off
-            else if (filter_val == 2) SSD1322_DrawString(0, 25, 1, (unsigned char*)"3Lin Fast "); // Linear phase fast roll-off
-            else if (filter_val == 3) SSD1322_DrawString(0, 25, 1, (unsigned char*)"4Lin LowR "); // Linear phase fast roll-off low ripple
-            else if (filter_val == 4) SSD1322_DrawString(0, 25, 1, (unsigned char*)"5Lin Slow "); // Linear phase slow roll-off
-            else if (filter_val == 5) SSD1322_DrawString(0, 25, 1, (unsigned char*)"6Min Fast "); // Minimum phase fast roll-off
-            else if (filter_val == 6) SSD1322_DrawString(0, 25, 1, (unsigned char*)"7Min Slow "); // Minimum phase slow roll-off
-            else                      SSD1322_DrawString(0, 25, 1, (unsigned char*)"8Min LowD "); // Minimum phase slow roll-off low dispersion
+																			SSD1322_DrawString(25, 0, 0, (unsigned char*)"FIR");
+            if (filter_val == 0)      SSD1322_DrawString(5, 35, 0, (unsigned char*)"1 MIN PHASE"); // Minimum phase (default)
+            else if (filter_val == 1) SSD1322_DrawString(5, 35, 0, (unsigned char*)"2 LIN APOD "); // Linear phase apodizing fast roll-off
+            else if (filter_val == 2) SSD1322_DrawString(5, 35, 0, (unsigned char*)"3 LIN FAST "); // Linear phase fast roll-off
+            else if (filter_val == 3) SSD1322_DrawString(5, 35, 0, (unsigned char*)"4 LIN LOWR "); // Linear phase fast roll-off low ripple
+            else if (filter_val == 4) SSD1322_DrawString(5, 35, 0, (unsigned char*)"5 LIN SLOW "); // Linear phase slow roll-off
+            else if (filter_val == 5) SSD1322_DrawString(5, 35, 0, (unsigned char*)"6 MIN FAST "); // Minimum phase fast roll-off
+            else if (filter_val == 6) SSD1322_DrawString(5, 35, 0, (unsigned char*)"7 MIN SLOW "); // Minimum phase slow roll-off
+            else                      SSD1322_DrawString(5, 35, 0, (unsigned char*)"8 MIN LOWD "); // Minimum phase slow roll-off low dispersion
             break;
             
         case 3: // MODE_BALANCE
 						//SSD1322_ClearRAM();
             // Выводим текст "BAL: " напрямую
-            SSD1322_DrawString(0, 20, 0, (unsigned char*)"Balance");
+            SSD1322_DrawString(15, 0, 0, (unsigned char*)"BALANCE");
             
             // Быстро бьем байт на сотни, десятки и единицы
             unsigned char bal_str[4];
@@ -361,8 +384,8 @@ void Update_Bottom_Line(void) {
 
             
             // Печатаем получившиеся три цифры сразу за текстом (сдвиг по X на 40 пикселей)
-            SSD1322_DrawString(35, 20, 0, bal_str);
-						SSD1322_DrawString(52, 20, 0, (unsigned char*)"dB");
+            SSD1322_DrawString(20, 35, 0, bal_str);
+						SSD1322_DrawString(35, 35, 0, (unsigned char*)"dB");
             break;
     }
 
@@ -378,7 +401,25 @@ void Process_XMOS_Signal(void) {												// ----- ОБРАБОТКА СИГНАЛА ОТ XMOS-X
          uint8_t signal = UART_XMOS_GetSignal();
         if (signal != 0) {
             switch (signal) {
-                case 0x01: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM   44.1kHz"); break;
+							//SSD1322_DrawSmallString(30, 56, "DSD256");
+							  case 0x01: SSD1322_DrawSmallString(37, 0, "PCM 44.1kHz  "); break;
+                case 0x02: SSD1322_DrawSmallString(37, 0, "PCM 48kHz    "); break;
+                case 0x03: SSD1322_DrawSmallString(37, 0, "PCM 88.2kHz  "); break;
+                case 0x04: SSD1322_DrawSmallString(37, 0, "PCM 96kHz    "); break;
+                case 0x05: SSD1322_DrawSmallString(37, 0, "PCM 176.4kHz "); break;
+                case 0x06: SSD1322_DrawSmallString(37, 0, "PCM 192kHz   "); break;
+                case 0x07: SSD1322_DrawSmallString(37, 0, "PCM 352.8kHz "); break;
+                case 0x08: SSD1322_DrawSmallString(37, 0, "PCM 384kHz   "); break;
+                case 0x09: SSD1322_DrawSmallString(37, 0, "PCM 705.6kHz "); break;
+                case 0x0A: SSD1322_DrawSmallString(37, 0, "PCM 768kHz   "); break;
+                case 0x0B: SSD1322_DrawSmallString(37, 0, "PCM 1411.2kHz"); break;
+                case 0x0C: SSD1322_DrawSmallString(37, 0, "PCM 1536kHz  "); break;
+                case 0x19: SSD1322_DrawSmallString(37, 0, "DSD64 2.822  "); break;
+                case 0x1A: SSD1322_DrawSmallString(37, 0, "DSD128 5.644 "); break;
+                case 0x1B: SSD1322_DrawSmallString(37, 0, "DSD256 11.289"); break;
+                case 0x1C: SSD1322_DrawSmallString(37, 0, "DSD512 22.579"); break;
+                case 0x1D: SSD1322_DrawSmallString(37, 0, "DSD1024 45.15"); break;
+              /*  case 0x01: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM   44.1kHz"); break;
                 case 0x02: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM     48kHz"); break;
                 case 0x03: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM   88.2kHz"); break;
                 case 0x04: SSD1322_DrawString(0, 5, 0, (unsigned char*)"PCM     96kHz"); break;
@@ -394,7 +435,7 @@ void Process_XMOS_Signal(void) {												// ----- ОБРАБОТКА СИГНАЛА ОТ XMOS-X
                 case 0x1A: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD128  5.644"); break;
                 case 0x1B: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD256 11.289"); break;
                 case 0x1C: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD512 22.579"); break;
-                case 0x1D: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD1024 45.15"); break;
+                case 0x1D: SSD1322_DrawString(0, 5, 0, (unsigned char*)"DSD1024 45.15"); break;*/
             }
         }
 		}
@@ -544,22 +585,29 @@ void EXTI9_5_IRQHandler(void) {
   * @retval None
   */
 void TIM4_IRQHandler(void) {
-    if (TIM4->SR & TIM_SR_UIF) {
-        TIM4->SR &= ~TIM_SR_UIF;
-
-        if (halt_counter && halt_counter < hall_timer_sec) halt_counter++;
-        if (menu_counter && menu_counter < menu_timer_sec) menu_counter++;
-
-        if (button_pressed) {
-            uint16_t now = TIM4->CNT;
-            uint16_t diff = (now >= button_tick) ? (now - button_tick) : (now + 10000 - button_tick);
-            if (diff >= DEBOUNCE_TICKS) {
-                button_pressed = 0;
-                ProcessButtonPress();
+					if (TIM4->SR & TIM_SR_UIF) {
+					TIM4->SR &= ~TIM_SR_UIF;
+					if (halt_counter && halt_counter < hall_timer_sec) halt_counter++;
+					if (menu_counter && menu_counter < menu_timer_sec) menu_counter++;
+					//	Ниже четыре строки для включения прерывания (маскировка второй посылки IR)
+					if (ir_delay_counter > 0) {
+					ir_delay_counter = 0;
+					EXTI->PR = EXTI_PR_PR5;       // Сжигаем застрявший в очереди флаг дубля пульта
+					NVIC_EnableIRQ(EXTI9_5_IRQn);  // IRQ ON Пульт снова готов
+}
+					if (button_pressed) {
+					uint16_t now = TIM4->CNT;
+					uint16_t diff = (now >= button_tick) ? (now - button_tick) : (now + 10000 - button_tick);
+					if (diff >= DEBOUNCE_TICKS) {
+					button_pressed = 0;
+					ProcessButtonPress();
             }
         }
     }
 }
+
+extern volatile uint16_t ir_delay_counter; 
+
 
 /**
   * @brief  Обработчик TIM2 (энкодер)
@@ -569,7 +617,6 @@ void TIM4_IRQHandler(void) {
 void TIM2_IRQHandler(void) {
     if (TIM2->SR & TIM_SR_UIF) {
         TIM2->SR &= ~TIM_SR_UIF;
-
         // Если Mute включён — выключаем при любом действии с энкодером
         if (mute_state) {
             SSD1322_CommandWrite(0xAF);
@@ -791,7 +838,7 @@ void ESS9039_SetInput(uint8_t input_num) {
 //-------------------------------------------
 
 void Process_IR_Command(uint32_t ir_code) {
-    switch (ir_code) {
+				switch (ir_code) {
         case 0x0B: // VOLUME++
             if (volume_val < 254) volume_val = volume_val + 2 ;
             menu_need_update = 1; // Взводим наш родной флаг экрана!
@@ -802,21 +849,21 @@ void Process_IR_Command(uint32_t ir_code) {
             break;
         case 0x5D: // MUTE
             mute_flag = !mute_flag; // Переключаем флаг при каждом нажатии (0 превратится в 1, а 1 в 0)
-						Set_DAC_Mute(mute_flag); // Дергаем нашу новую функцию --------MUTE--------- + DISP
+						Set_DAC_Mute(mute_flag); // Дергаем нашу функцию --------MUTE--------- + DISP
             menu_need_update = 1;
             break;
 				case 0x07: // BALANCE>R
             if (balance_val < 177) balance_val++;
             menu_mode_val = 3;     // Принудительно включаем экран БАЛАНСА
             menu_need_update = 1;
-						menu_counter = 1;      // Включаем встроенные часы!
+						menu_counter = 200;      // Включаем встроенные часы!
             break;
             
         case 0x08: // BALANCE<L
             if (balance_val > 77) balance_val--;
             menu_mode_val = 3;     // Принудительно включаем экран БАЛАНСА
             menu_need_update = 1;
-            menu_counter = 1;      // Включаем встроенные часы!
+            menu_counter = 200;      // Включаем встроенные часы!
             break;
 
 				case 0x02: // INPUT 
@@ -830,21 +877,6 @@ void Process_IR_Command(uint32_t ir_code) {
     }
 }  
 //
-    
-/**
-  * @brief  Управление режимом тишины (Soft Mute) для ЦАП ES9039
-  * @param  state: 1 - включить тишину (Mute On), 0 - вернуть звук (Mute Off)
-  * @retval None
-  */
-
-
-
-
-    
-    
-
-    
-   
     
 
 
@@ -878,9 +910,18 @@ void 	SSD1322_DrawAleksFull(uint8_t start_col_addr, uint8_t start_row, uint16_t 
 
 
 // ====================================================================================================================================================================
-
-
-
+// ============================================================
+//   
+// ============================================================
+void spice(uint16_t time){
+		SSD1322_DrawSmallString(1, 1,  " HIGH RESOLUTION DSD512 & PCM768");
+    SSD1322_DrawSmallString(1, 14, "  HIGH-END DAC ESS9039Q2M v3.7  ");
+    SSD1322_DrawSmallString(1, 27, "   CIRCUIT & DESIGN & SOFT BY   ");
+    SSD1322_DrawSmallString(1, 43, "    YARIGIN SERGEY (JSA) 2026   ");
+    SSD1322_DrawSmallString(1, 56, "    MADE ON THE PLANET EARTH    ");
+		delay_ms(time);																								//Заставка держится 1 секунду
+		SSD1322_ClearRAM();
+}
 void IR_Init(void) {
 // ============================================================
 // ИСПРАВЛЕННАЯ ИНИЦИАЛИЗАЦИЯ ИК-ПОРТА И ТАЙМЕРА TIM3
@@ -969,10 +1010,14 @@ int main(void) {
     // и когда данные контраста (preset.contrast) уже лежат в оперативной памяти!
     SSD1322_Init();           // Инициализация дисплея
     
+		
+		// Переменная счетчика задержки ИК-пульта (мы ее объявили volatile в другом файле)
+
+
     // ----- Настройка TIM4 (1 кГц) -----
     RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
-    TIM4->PSC = SystemCoreClock / 10000 - 1;
-    TIM4->ARR = 10000;
+    TIM4->PSC = SystemCoreClock / 7200 - 1;						//10000
+    TIM4->ARR = 10;																	//10000
     TIM4->DIER |= TIM_DIER_UIE;
     TIM4->CR1 |= TIM_CR1_CEN;
     NVIC_EnableIRQ(TIM4_IRQn);
@@ -1013,6 +1058,37 @@ delay_ms(10000);
 SSD1322_DrawString(0, 0, 1,(unsigned char*)"USB PCM 768 ");		
 //SSD1322_ClearRAM();
 */
+				//spice(30000);
+/* USER CODE BEGIN 2 */
+
+/* USER CODE BEGIN 2 */
+
+// Задаем свой счетчик секунд для старта
+uint8_t startup_seconds = 0;
+
+// Опрашиваем вход PA6 напрямую через регистр IDR (при нажатии — 0)
+if ((GPIOA->IDR & (1 << 6)) == 0) {
+    
+    // Пока кнопка зажата, сами считаем секунды
+    while ((GPIOA->IDR & (1 << 6)) == 0) {
+        
+        delay_ms(1000); // Ждем ровно 1 секунду
+        startup_seconds++; // Увеличиваем наш стартовый счетчик
+        
+        // Как только зажали на 3 секунды
+        if (startup_seconds >= 10) {
+            
+            spice(30000); // Врубаем визитку! Буквы сразу полетят на стекло по SPI
+            
+            // Глухая блокировка ЦАПа навсегда
+ //           while (1) {
+ //               __NOP(); 
+ //           }
+        }
+    }
+}
+
+/* USER CODE END 2 */
 
 
 				SSD1322_DrawAleksFull(35, 20, 1000);/// Пример вызова: X=30 (байт), Y=20 (строка)
@@ -1031,22 +1107,26 @@ SSD1322_DrawString(0, 0, 1,(unsigned char*)"USB PCM 768 ");
         Update_Bottom_Line(); // Спокойно и не спеша шлём данные в SPI в фоне!
 				}	
 				if 	(ir_packet_ready) {
-						static uint8_t global_ir_divider = 0;
+						//static uint8_t global_ir_divider = 0;
             ir_packet_ready = 0; // Сразу сбрасываем флаг прерывания
-					  global_ir_divider = !global_ir_divider; // Переключаем 0 -> 1 -> 0 -> 1
-            if (global_ir_divider == 1) 
-            {
+					  //global_ir_divider = !global_ir_divider; // Переключаем 0 -> 1 -> 0 -> 1
+            //if (global_ir_divider == 1) 
+            //{
 						Process_IR_Command(ir_rx_buffer[2]); 
-						}					
+						//}					
 				}
+
 	        // Сторож автовозврата экрана на главный
-        if (menu_counter >= 3 && menu_mode_val == 3) 
+        if (menu_counter >= 1000 && menu_mode_val == 3) 
         {
             menu_mode_val = 0;    // Сбрасываем экран на ГРОМКОСТЬ
             menu_need_update = 1; // Машем флажком перерисовки
             menu_counter = 0;     // Останавливаем и обнуляем часы
         }
-
+if 	(new_signal_received) {
+						new_signal_received = 0;
+            Process_XMOS_Signal();
+				}
 
 /*/ ============================================================
 

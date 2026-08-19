@@ -22,7 +22,7 @@ volatile uint8_t  ir_rx_buffer[4];       // Буфер под все 4 байта пульта
 volatile uint16_t hold_counter = 0; // Глобальный счётчик удержания пульта
 extern volatile uint16_t ir_last_tick;
 extern uint32_t screen_return_timer;
-
+volatile uint16_t ir_delay_counter = 0;
 // ============================================================
 // ОБНОВЛЕННЫЙ АВТОМАТ С ПОДДЕРЖКОЙ ПОВТОРА КНОПКИ (REPEAT)
 // ============================================================
@@ -53,9 +53,11 @@ if ((duration > 9500 && duration < 10300) && (ir_state == 0)) {
             if (duration > 1050 && duration < 1180) {
                 // Маяк для main.c: выставляем специальный флаг повтора!
                 // Для этого запишем в ir_rx_buffer[0] особый маркер, например, 0xEE
-                ir_rx_buffer[0] = 0xEE; 
-                ir_packet_ready = 1;      // Говорим мейну: "Кнопку всё ещё держат!"
-                ir_state = IR_STATE_IDLE; // Сразу уходим в ожидание следующего повтора
+							if(ir_rx_buffer[2] == 0x02 || ir_rx_buffer[2] == 0x5E || ir_rx_buffer[2] == 0x5D){		// Для следующих кнопок повтор запрещён 
+                ir_rx_buffer[2] = 0xEE;				// производим подмену байта на неликвидный
+							}
+                ir_packet_ready = 1;      				// Говорим мейну: "Кнопку всё ещё держат!"
+                ir_state = IR_STATE_IDLE; 				// Сразу уходим в ожидание следующего повтора
             }
             break;
 
@@ -79,8 +81,14 @@ if ((duration > 9500 && duration < 10300) && (ir_state == 0)) {
                 ir_rx_buffer[2] = (uint8_t)((ir_current_packet >> 16) & 0xFF); 
                 ir_rx_buffer[3] = (uint8_t)((ir_current_packet >> 24) & 0xFF); 
                 
-                ir_packet_ready = 1;      
-                ir_state = IR_STATE_IDLE; 
+                ir_packet_ready = 1;  
+    
+								if (ir_rx_buffer[2] == 0x5E || ir_rx_buffer[2] == 0x5D || ir_rx_buffer[2] == 0x02) {					// Если прилетел байт одной из трех проблемных кнопок
+								NVIC_DisableIRQ(EXTI9_5_IRQn); // ВЫРУБИЛИ АВТОМАТ! Пульт ослеп наглухо
+								ir_delay_counter = 300;        // Запустили задержку на 300 	
+								ir_state = IR_STATE_IDLE;
+    }
+
             }
             break;
 
