@@ -152,41 +152,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>721</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134222960</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\main\main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\SSD1322_Amanero\main/main.c\721</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>429</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134221404</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\main\main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\SSD1322_Amanero\main/main.c\429</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
           <LineNumber>88</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134233226</Address>
+          <Address>134233482</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -198,11 +166,11 @@
           <Expression>\\SSD1322_Amanero\IR_REMOTE/ir_remote.c\88</Expression>
         </Bp>
         <Bp>
-          <Number>3</Number>
+          <Number>1</Number>
           <Type>0</Type>
           <LineNumber>86</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134233180</Address>
+          <Address>134233436</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -214,52 +182,100 @@
           <Expression>\\SSD1322_Amanero\IR_REMOTE/ir_remote.c\86</Expression>
         </Bp>
         <Bp>
-          <Number>4</Number>
+          <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>32</LineNumber>
+          <LineNumber>326</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134232762</Address>
+          <Address>134219924</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\IR_REMOTE\ir_remote.c</Filename>
+          <Filename>.\main\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\SSD1322_Amanero\IR_REMOTE/ir_remote.c\32</Expression>
+          <Expression>\\SSD1322_Amanero\main/main.c\326</Expression>
+        </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>339</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134220252</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\main\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\SSD1322_Amanero\main/main.c\339</Expression>
+        </Bp>
+        <Bp>
+          <Number>4</Number>
+          <Type>0</Type>
+          <LineNumber>360</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134220596</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\main\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\SSD1322_Amanero\main/main.c\360</Expression>
         </Bp>
         <Bp>
           <Number>5</Number>
           <Type>0</Type>
-          <LineNumber>30</LineNumber>
+          <LineNumber>1008</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134232744</Address>
+          <Address>134224920</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\IR_REMOTE\ir_remote.c</Filename>
+          <Filename>.\main\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\SSD1322_Amanero\IR_REMOTE/ir_remote.c\30</Expression>
+          <Expression>\\SSD1322_Amanero\main/main.c\1008</Expression>
         </Bp>
         <Bp>
           <Number>6</Number>
           <Type>0</Type>
-          <LineNumber>433</LineNumber>
-          <EnabledFlag>0</EnabledFlag>
-          <Address>0</Address>
+          <LineNumber>976</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134224646</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
+          <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\main\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression></Expression>
+          <Expression>\\SSD1322_Amanero\main/main.c\976</Expression>
+        </Bp>
+        <Bp>
+          <Number>7</Number>
+          <Type>0</Type>
+          <LineNumber>976</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134224978</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\main\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\SSD1322_Amanero\main/main.c\976</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -437,6 +453,31 @@
           <count>34</count>
           <WinNumber>1</WinNumber>
           <ItemText>menu_mode_val</ItemText>
+        </Ww>
+        <Ww>
+          <count>35</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>menu_timer_sec</ItemText>
+        </Ww>
+        <Ww>
+          <count>36</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>menu_counter</ItemText>
+        </Ww>
+        <Ww>
+          <count>37</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>menu_idle_timer_ir</ItemText>
+        </Ww>
+        <Ww>
+          <count>38</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>menu_idle_timer_enc</ItemText>
+        </Ww>
+        <Ww>
+          <count>39</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\SSD1322_Amanero\main/main.c\menu_level</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

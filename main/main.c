@@ -32,7 +32,7 @@ volatile uint16_t ir_last_tick = 0; // Время последнего импульса пульта
 void Set_Volume_And_Balance(uint8_t volume_val, uint8_t balance_val);
 void Process_XMOS_Signal(void);
 static uint8_t last_mute = 255; // Черновик: помнит состояние Mute в прошлом круге
-uint8_t signal =0;
+uint8_t signal = 0;
 
 /* ============================================================
    1.  ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (состояние устройства)
@@ -79,6 +79,8 @@ unsigned int menu_timer_sec = 2100;
 unsigned int contrast;
 uint8_t remote_packet[4];
 uint8_t ir_cmd = 0; 
+uint32_t menu_idle_timer_ir  = 0; //  переменная для автовозврата IR-BALANCE
+uint32_t menu_idle_timer_enc = 0; //  переменная для автовозврата ENC
 /* ============================================================
    2.  КОНСТАНТЫ И МАКРОСЫ
    ============================================================ */
@@ -104,6 +106,9 @@ uint8_t ir_cmd = 0;
 #define FLASH_PRESET_ADDR   0x0800FC00
 #define PRESET_WORD_CNT  2
 #define ESS9028_I2C_ADDR   0x48 // Адрес ЦАПа на шине I2C
+#define TIME_IDL_IR			10000
+#define TIME_IDL_ENC		1000000
+
 /* ============================================================
 		JSA
    ============================================================ */
@@ -316,6 +321,8 @@ void Update_Bottom_Line(void) {
             if (input_val == 0)      SSD1322_DrawString(80, 32, 0, (unsigned char*)"  USB  ");            // Выводим реальный вход в зависимости от input_val
 						else if (input_val == 1) SSD1322_DrawString(80, 33, 0, (unsigned char*)"S/PDIF");
 						else                     SSD1322_DrawString(80, 32, 0, (unsigned char*)"TOSLINK");
+						//menu_idle_timer_enc = 0;																	// Запуск/Перезапуск таймера для ENCODER
+						//menu_idle_timer_ir = TIME_IDL_IR;													// Останов  таймера
             break;            
         case 2: 																																		// MODE_FILTER Выводим красивое название фильтра ESS9039 "БОЛЬШОЕ МЕНЮ"
 																			SSD1322_DrawString(25, 0, 0, (unsigned char*)"FIR");
@@ -327,6 +334,8 @@ void Update_Bottom_Line(void) {
             else if (filter_val == 5) SSD1322_DrawString(5, 35, 0, (unsigned char*)"6 MIN FAST "); // Minimum phase fast roll-off
             else if (filter_val == 6) SSD1322_DrawString(5, 35, 0, (unsigned char*)"7 MIN SLOW "); // Minimum phase slow roll-off
             else                      SSD1322_DrawString(5, 35, 0, (unsigned char*)"8 MIN LOWD "); // Minimum phase slow roll-off low dispersion
+						//menu_idle_timer_enc = 0;																	// Запуск/Перезапуск таймера для ENCODER
+						//menu_idle_timer_ir = TIME_IDL_IR;													// Останов  таймера
             break;            
         case 3: 																																																						// MODE_BALANCE
             SSD1322_DrawString(15, 0, 0, (unsigned char*)"BALANCE");            													// Выводим текст "BALANCE" "БОЛЬШОЕ МЕНЮ"
@@ -346,7 +355,9 @@ void Update_Bottom_Line(void) {
 						bal_str[3] = '\0'; 																											// Конец строки            
             SSD1322_DrawString(20, 35, 0, bal_str);																	// Печатаем получившиеся три цифры сразу за текстом (сдвиг по X на 40 пикселей)
 						SSD1322_DrawString(35, 35, 0, (unsigned char*)"dB");
-            break;
+            //menu_idle_timer_enc = 0;																	// Запуск/Перезапуск таймера для ENCODER
+						//menu_idle_timer_ir = TIME_IDL_IR;													// Останов  таймера
+						break;
 				case 4: 																																																						// MODE_BALANCE
             SSD1322_DrawString(12, 0, 0, (unsigned char*)"BRIGHTNESS");            													// Выводим текст "BALANCE" "БОЛЬШОЕ МЕНЮ"
             unsigned char bra_str[4];																								// Быстро бьем байт на сотни, десятки и единицы
@@ -364,6 +375,8 @@ void Update_Bottom_Line(void) {
 						bra_str[2] = (contrast_val % 10) + '0';																	// Единицы выводим всегда, даже если это чистый ноль
 						bra_str[3] = '\0'; 																											// Конец строки            
             SSD1322_DrawString(20, 35, 0, bra_str);																	// Печатаем получившиеся три цифры сразу за текстом (сдвиг по X на 40 пикселей)
+						//menu_idle_timer_enc = 0;																	// Запуск/Перезапуск таймера для ENCODER
+						//menu_idle_timer_ir = TIME_IDL_IR;													// Останов  таймера
 						//SSD1322_DrawString(35, 35, 0, (unsigned char*)"dB");
             break;		
     }
@@ -426,7 +439,7 @@ void ProcessButtonPress(void)
     }
     menu_level = 1; 																								// Сюда попадем, только если отпустили кнопку РАНЬШЕ 2 секунд (короткий клик)
     menu_mode_val++;
-    if (menu_mode_val > 4) menu_mode_val = 0;					//    !!!!  5/1 ?????
+    if (menu_mode_val > 4) menu_mode_val = 0;					
     menu_need_update = 1;
 }
 
@@ -702,21 +715,21 @@ void ESS9039_SetInput(uint8_t input_num) {
 
 
 // =================IR-REMOTE====================================================================================================================================================
-//-------------------------------------------
-//-------------------0X0B--------------------
-//-------------------------------------------
-//-------------------------------------------
-//-------------------------------------------
-//-----0X08----------0X5D-----------0X07-----
-//-------------------------------------------
-//-------------------------------------------
-//-------------------------------------------
-//-------------------0X0D--------------------
-//-------------------------------------------
-//-------------------------------------------
-//-------------------------------------------
-//-----0X02-------------------------0X5E-----
-//-------------------------------------------
+								//-------------------------------------------//
+								//-------------------0X0B--------------------//
+								//-------------------------------------------//
+								//-------------------------------------------//
+								//-------------------------------------------//
+								//-----0X08----------0X5D-----------0X07-----//
+								//-------------------------------------------//
+								//-------------------------------------------//
+								//-------------------------------------------//
+								//-------------------0X0D--------------------//
+								//-------------------------------------------//
+								//-------------------------------------------//
+								//-------------------------------------------//
+								//-----0X02-------------------------0X5E-----//
+								//-------------------------------------------//
 
 void Process_IR_Command(uint32_t ir_code) {
 				switch (ir_code) {
@@ -737,14 +750,14 @@ void Process_IR_Command(uint32_t ir_code) {
             if (balance_val < 177) balance_val++;
             menu_mode_val = 3;     // Принудительно включаем экран БАЛАНСА
             menu_need_update = 1;
-						menu_counter = 1000;      // Включаем встроенные часы!
+						//menu_idle_timer_ir = 0;   // Обнуляем свой таймер
             break;
             
         case 0x08: // BALANCE<L
             if (balance_val > 77) balance_val--;
             menu_mode_val = 3;     // Принудительно включаем экран БАЛАНСА
             menu_need_update = 1;
-            menu_counter = 1000;      // Включаем встроенные часы!
+						//menu_idle_timer_ir = 0;   // Обнуляем свой таймер
             break;
 
 				case 0x02: // INPUT 
@@ -938,8 +951,8 @@ SSD1322_DrawString(0, 0, 1,(unsigned char*)"USB PCM 768 ");
 uint8_t startup_seconds = 0;
 
 
-				if ((GPIOA->IDR & (1 << 6)) == 0) {																	// Опрашиваем вход PA6 напрямую через регистр IDR (при нажатии — 0)    
-				while ((GPIOA->IDR & (1 << 6)) == 0) {													// Пока кнопка зажата, сами считаем секунды       
+				if ((GPIOA->IDR & (1 << 6)) == 0) {													// Опрашиваем вход PA6 напрямую через регистр IDR (при нажатии — 0)    
+				while ((GPIOA->IDR & (1 << 6)) == 0) {											// Пока кнопка зажата, сами считаем секунды       
         delay_ms(1000); 																						// Ждем ровно 1 секунду
         startup_seconds++; 																					// Увеличиваем наш стартовый счетчик        																																		// Как только зажали на 3 секунды
         if (startup_seconds >= 10) {            
@@ -966,22 +979,23 @@ uint8_t startup_seconds = 0;
         Update_Bottom_Line(); 																			// Спокойно и не спеша шлём данные в SPI в фоне!
 				}	
 				if 	(ir_packet_ready) {
-            ir_packet_ready = 0; // Сразу сбрасываем флаг прерывания
+            ir_packet_ready = 0; // N?aco na?anuaaai oeaa i?a?uaaiey
 
 						Process_IR_Command(ir_rx_buffer[2]); 
 			
 				}
 
-	        // Сторож автовозврата экрана на главный
-        if (menu_counter >= 3000 && menu_mode_val == 3) 
-        {
-            menu_mode_val = 0;    // Сбрасываем экран на ГРОМКОСТЬ
-            menu_need_update = 1; // Машем флажком перерисовки
-            menu_counter = 0;     // Останавливаем и обнуляем часы
-        }
-if 	(new_signal_received) {
+	        // Noi?i? aaoiaica?aoa ye?aia ia aeaaiue
+				//if (menu_counter >= 30 && menu_mode_val == 3) 
+        //{
+        //    menu_mode_val = 0;    // Na?anuaaai ye?ai ia A?IIEINOU
+        //    menu_need_update = 1; // Iaoai oea?eii ia?a?eniaee
+         //   menu_counter = 0;     // Inoaiaaeeaaai e iaioeyai ?anu
+        //}
+						
+						if 	(new_signal_received) {																					//XMOS UART
 						new_signal_received = 0;
             Process_XMOS_Signal();
-				}
+						}
 	}
 }

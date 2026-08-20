@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\SSD1322_Amanero.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\SSD1322_Amanero.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Wed Aug 19 22:21:56 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Thu Aug 20 02:42:47 2026
 <BR><P>
 <H3>Maximum Stack Usage =        240 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -528,7 +528,7 @@ Global Symbols
 <BR><BR>[Calls]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESS9028_WriteReg
 </UL>
 
-<P><STRONG><a name="[5c]"></a>Process_IR_Command</STRONG> (Thumb, 428 bytes, Stack size 16 bytes, main.o(.text))
+<P><STRONG><a name="[5c]"></a>Process_IR_Command</STRONG> (Thumb, 400 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = Process_IR_Command &rArr; Set_DAC_Mute
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Set_DAC_Mute
@@ -566,7 +566,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[40]"></a>main</STRONG> (Thumb, 636 bytes, Stack size 16 bytes, main.o(.text))
+<P><STRONG><a name="[40]"></a>main</STRONG> (Thumb, 564 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 240<LI>Call Chain = main &rArr; Update_Bottom_Line &rArr; SSD1322_DrawString &rArr; SSD1322_DrawSingleAscii &rArr; SSD1322_Data_processing &rArr; SSD1322_DataWrite &rArr; Spi_Write_Data &rArr; delay_us &rArr; delta
 </UL>
 <BR>[Calls]<UL><LI><a href="#[6a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Connect_DAC
