@@ -19,6 +19,51 @@
 #include "UART_XMOS.h"
 #include "ir_remote.h"
 #include "aleks_font.h" // Подключаем наш гигантский шрифт
+
+
+// ============================================================
+//  ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ОГРАНИЧЕНИЯ ЗНАЧЕНИЙ
+// ============================================================
+static inline float constrain_float(float x, float min_val, float max_val) {
+    if (x < min_val) return min_val;
+    if (x > max_val) return max_val;
+    return x;
+}
+
+
+
+// ============================================================
+//  РАСЧЁТ ГРОМКОСТИ И БАЛАНСА (как в Arduino-проекте)
+//  volume: 0..100 (0 — тишина, 100 — максимум)
+//  balance: 0..255 (0 — левый, 127 — центр, 255 — правый)
+// ============================================================
+
+void Calculate_Volume_Balance(uint8_t volume_percent, uint8_t balance_raw, uint8_t *left, uint8_t *right) {
+    // 1. Преобразуем 0..100 в шкалу дБ (от -127.5 до 0)
+    //    volume_percent = 0   > -127.5 дБ (тишина)
+    //    volume_percent = 50  > -63.75 дБ
+    //    volume_percent = 100 > 0 дБ (максимум)
+    float dB = -(127.5f * (100 - volume_percent) / 100.0f);
+
+    // 2. Баланс (0..255 > -127.5..+127.5, центр 127 > 0)
+    //    balance_raw = 127 > центр > баланс не меняет громкость
+    int16_t balance = (int16_t)(balance_raw - 127); // -127..+127
+
+    // 3. Сдвиг для каждого канала (как в оригинале)
+    int16_t delta = balance / 2;  // -63..+63
+
+    // 4. Левый и правый каналы
+    float left_dB  = constrain_float(dB + delta, -127.5f, 0.0f);
+    float right_dB = constrain_float(dB - delta, -127.5f, 0.0f);
+
+    // 5. Преобразуем дБ в байты для регистров ЦАП
+    *left  = (uint8_t)(-left_dB * 2.0f);   // 0..255
+    *right = (uint8_t)(-right_dB * 2.0f);  // 0..255
+}
+
+
+
+
 //#include "font_small.h"
 extern const unsigned char SmallFont[][6];
 extern volatile uint8_t rx_buffer[];      // Наш массив из UART_XMOS.c
@@ -269,7 +314,7 @@ void I2C2_WriteByte(uint8_t addr, uint8_t data) {
 
 
 /* ============================================================
-   MENU  ЛОГИКА ОБРАБОТКИ НАЖАТИЯ КНОПКИ
+   MENU  
    ============================================================ */
 void Update_Bottom_Line(void) {
 						char buf[16];						    
@@ -280,7 +325,54 @@ void Update_Bottom_Line(void) {
         last_mute = mute_flag;       																				// Запоминаем новое состояние Mute
     }
         switch (menu_mode_val) {
-				case 0: 																																													// MODE_VOLUME
+					
+					
+					
+					case 0: 																																													// MODE_VOLUME
+    if (mute_flag == 1) {
+        SSD1322_DrawString(0, 20, 0, (unsigned char*)"  MUTE"); 		// Если звук выключен — пишем MUTE
+    } else {
+        // ---- ГРОМКОСТЬ С МИНУСОМ (как в Arduino-проекте) ----
+        // volume_val: 0..100 > преобразуем в дБ: -127.5..0
+        float dB = -(127.5f * (100 - volume_val) / 100.0f);
+        // Округляем до целого (как в старом проекте)
+        int dB_int = (int)(dB + 0.5f); // округление
+
+        char vol_buf[16];
+        if (dB_int == 0) {
+            sprintf(vol_buf, "  0 dB ");   // максимум
+        } else {
+            sprintf(vol_buf, "%3d dB ", dB_int); // например " -35 dB"
+        }
+        SSD1322_DrawString(30, 20, 0, (unsigned char*)vol_buf);
+        // Выводим надпись VOLUME чуть выше (опционально)
+        SSD1322_DrawString(0, 20, 0, (unsigned char*)"VOLUME");
+    }
+
+    // --- ВСЁ ОСТАЛЬНОЕ (вход, фильтр, XMOS) БЕЗ ИЗМЕНЕНИЙ ---
+				 if (input_val == 0)      SSD1322_DrawSmallString(7, 56,"INPUT USB     ");
+			else if (input_val == 1) SSD1322_DrawSmallString(7, 56,"INPUT S/PDIF  ");
+			else                     SSD1322_DrawSmallString(7, 56,"INPUT TOSLINK ");
+			int bal_display = (int)balance_val - 127; // -127..+127
+			char bal_small[16];
+			sprintf(bal_small, "BALANCE %d  ", bal_display);
+			SSD1322_DrawSmallString(39, 56, bal_small);  // X=37, Y=56 (как ты просил)
+
+					 if (filter_val == 0) SSD1322_DrawSmallString(1, 0,"FIR1 MinPhase");
+			else if (filter_val == 1) SSD1322_DrawSmallString(1, 0,"FIR2 LinApod");
+			else if (filter_val == 2) SSD1322_DrawSmallString(1, 0,"FIR3 LinFast");
+			else if (filter_val == 3) SSD1322_DrawSmallString(1, 0,"FIR4 LinLowR");
+			else if (filter_val == 4) SSD1322_DrawSmallString(1, 0,"FIR5 LinSlow");
+			else if (filter_val == 5) SSD1322_DrawSmallString(1, 0,"FIR6 MinFast");
+			else if (filter_val == 6) SSD1322_DrawSmallString(1, 0,"FIR7 MinSlow");
+			else                      SSD1322_DrawSmallString(1, 0,"FIR8 MinLowD");
+
+    Process_XMOS_Signal();
+    break;
+					
+					
+					
+				/*case 0: 																																													// MODE_VOLUME
 						if (mute_flag == 1) {
 								
 								SSD1322_DrawString(0, 20, 0, (unsigned char*)"  MUTE"); 		// Если звук выключен — пишем MUTE в те же координаты, перекрывая громкость!
@@ -315,7 +407,7 @@ void Update_Bottom_Line(void) {
             else if (filter_val == 6) SSD1322_DrawSmallString(1, 0,"FIR7 MinSlow"); // Minimum phase slow roll-off
             else                      SSD1322_DrawSmallString(1, 0,"FIR8 MinLowD"); // Minimum phase slow roll-off low dispersion
 						Process_XMOS_Signal();
-						break;
+						break;*/
         case 1: 																																																							// MODE_INPUT
 																			SSD1322_DrawString(19, 0, 0, (unsigned char*)"INPUT");							// "NAME"
             if (input_val == 0)      SSD1322_DrawString(80, 32, 0, (unsigned char*)"  USB  ");            // Выводим реальный вход в зависимости от input_val
@@ -336,8 +428,19 @@ void Update_Bottom_Line(void) {
             else                      SSD1322_DrawString(5, 35, 0, (unsigned char*)"8 MIN LOWD "); // Minimum phase slow roll-off low dispersion
 						//menu_idle_timer_enc = 0;																	// Запуск/Перезапуск таймера для ENCODER
 						//menu_idle_timer_ir = TIME_IDL_IR;													// Останов  таймера
-            break;            
-        case 3: 																																																						// MODE_BALANCE
+            break;  
+
+				case 3:  // MODE_BALANCE
+    SSD1322_DrawString(15, 0, 0, (unsigned char*)"BALANCE");
+    // balance_val: 0..255 > центр 127 > 0
+    bal_display = (int)balance_val - 127; // -127..+127
+    char bal_buf[16];
+    sprintf(bal_buf, "%d  ", bal_display);   // просто число со знаком
+    SSD1322_DrawString(25, 35, 0, (unsigned char*)bal_buf);
+    break;
+
+				
+        /*case 3: 																																																						// MODE_BALANCE
             SSD1322_DrawString(15, 0, 0, (unsigned char*)"BALANCE");            													// Выводим текст "BALANCE" "БОЛЬШОЕ МЕНЮ"
             unsigned char bal_str[4];																								// Быстро бьем байт на сотни, десятки и единицы
                     
@@ -357,9 +460,9 @@ void Update_Bottom_Line(void) {
 						SSD1322_DrawString(35, 35, 0, (unsigned char*)"dB");
             //menu_idle_timer_enc = 0;																	// Запуск/Перезапуск таймера для ENCODER
 						//menu_idle_timer_ir = TIME_IDL_IR;													// Останов  таймера
-						break;
+						break;*/
 				case 4: 																																																						// MODE_BALANCE
-            SSD1322_DrawString(12, 0, 0, (unsigned char*)"BRIGHTNESS");            													// Выводим текст "BALANCE" "БОЛЬШОЕ МЕНЮ"
+            SSD1322_DrawString(8, 0, 0, (unsigned char*)"BRIGHTNESS");            													// Выводим текст "BALANCE" "БОЛЬШОЕ МЕНЮ"
             unsigned char bra_str[4];																								// Быстро бьем байт на сотни, десятки и единицы
                     
 						if (contrast_val / 100 == 0) {																						// Сотни: если сотен нет, пишем пробел, иначе — цифру
@@ -368,13 +471,13 @@ void Update_Bottom_Line(void) {
 								bra_str[0] = (contrast_val / 100) + '0';
 						}
 						if ((contrast_val / 100 == 0) && (((contrast_val % 100) / 10) == 0)) {		// Десятки: если сотен нет И десятков нет — пишем пробел, иначе — цифру
-								bal_str[1] = ' ';
+								bra_str[1] = ' ';
 						} else {
 								bra_str[1] = ((contrast_val % 100) / 10) + '0';
 						}						
 						bra_str[2] = (contrast_val % 10) + '0';																	// Единицы выводим всегда, даже если это чистый ноль
 						bra_str[3] = '\0'; 																											// Конец строки            
-            SSD1322_DrawString(20, 35, 0, bra_str);																	// Печатаем получившиеся три цифры сразу за текстом (сдвиг по X на 40 пикселей)
+            SSD1322_DrawString(22, 35, 0, bra_str);																	// Печатаем получившиеся три цифры сразу за текстом (сдвиг по X на 40 пикселей)
 						//menu_idle_timer_enc = 0;																	// Запуск/Перезапуск таймера для ENCODER
 						//menu_idle_timer_ir = TIME_IDL_IR;													// Останов  таймера
 						//SSD1322_DrawString(35, 35, 0, (unsigned char*)"dB");
@@ -384,7 +487,7 @@ void Update_Bottom_Line(void) {
 
 //==========================UART-DISPLAY=========================================================================
 void Process_XMOS_Signal(void) {												// ----- ОБРАБОТКА СИГНАЛА ОТ XMOS-XU316 pin12 -----
-
+								if(menu_mode_val==0){
             switch (last_signal) {
 
 							  case 0x01: SSD1322_DrawSmallString(37, 0, "PCM 44.1kHz  "); break;
@@ -406,7 +509,7 @@ void Process_XMOS_Signal(void) {												// ----- ОБРАБОТКА СИГНАЛА ОТ XMOS-X
                 case 0x1D: SSD1322_DrawSmallString(37, 0, "DSD1024 45.15"); break;
             }
         }
-
+		}
 
 //===================================== J S A PRESS BUTTON (ENC) =================================================================
 void ProcessButtonPress(void)
@@ -536,7 +639,11 @@ if (enc_direction) {
     // --- КРУТИМ ВПРАВО (ВЕЛИЧЕНИЕ) ---
     switch (menu_mode_val) {
         case 0: 																																	// =============================Громкость=============================
-            if (volume_val < 255) volume_val++;
+            if (enc_direction) {
+								if (volume_val < 100) volume_val++;   // Максимум 100
+						} else {
+								if (volume_val > 0) volume_val--;     // Минимум 0
+						}
             break;
         case 1: 																																	// ===============================Вход================================
             input_val = (input_val + 1) % 3; 																			// Крутим по кругу: USB -> COA -> OPT -> BRIGHT
@@ -734,11 +841,11 @@ void ESS9039_SetInput(uint8_t input_num) {
 void Process_IR_Command(uint32_t ir_code) {
 				switch (ir_code) {
         case 0x0B: // VOLUME++
-            if (volume_val < 254) volume_val = volume_val + 2 ;
+            if (volume_val < 100) volume_val = volume_val + 1 ;
             menu_need_update = 1; // Взводим наш родной флаг экрана!
             break;
         case 0x0D: // VOLUME--
-            if (volume_val > 0) volume_val = volume_val - 2;
+            if (volume_val > 0) volume_val = volume_val - 1;
             menu_need_update = 1;
             break;
         case 0x5D: // MUTE
@@ -748,14 +855,14 @@ void Process_IR_Command(uint32_t ir_code) {
             break;
 				case 0x07: // BALANCE>R
             if (balance_val < 177) balance_val++;
-            menu_mode_val = 3;     // Принудительно включаем экран БАЛАНСА
+            //menu_mode_val = 3;     // Принудительно включаем экран БАЛАНСА
             menu_need_update = 1;
 						//menu_idle_timer_ir = 0;   // Обнуляем свой таймер
             break;
             
         case 0x08: // BALANCE<L
             if (balance_val > 77) balance_val--;
-            menu_mode_val = 3;     // Принудительно включаем экран БАЛАНСА
+            //menu_mode_val = 3;     // Принудительно включаем экран БАЛАНСА
             menu_need_update = 1;
 						//menu_idle_timer_ir = 0;   // Обнуляем свой таймер
             break;
@@ -797,6 +904,8 @@ void 	SSD1322_DrawAleksFull(uint8_t start_col_addr, uint8_t start_row, uint16_t 
 			SSD1322_DataWrite(0x00);																			// Это гарантирует, что контроллер ровно закроет "шаг" адресации
 		}
 	}
+			SSD1322_DrawSmallString(10, 0,"Crafted for Audiophiles");
+	SSD1322_DrawSmallString(1, 56,"HiRes ESS9039Q2M Tube Diff Stage");
 			//SSD1322_DrawSmallString(28, 35, "SERGEY888");						//        TEST FONT
 			delay_ms(time);																								//Заставка держится 1 секунду
 			SSD1322_ClearRAM();
@@ -956,7 +1065,7 @@ uint8_t startup_seconds = 0;
         delay_ms(1000); 																						// Ждем ровно 1 секунду
         startup_seconds++; 																					// Увеличиваем наш стартовый счетчик        																																		// Как только зажали на 3 секунды
         if (startup_seconds >= 10) {            
-            spice(30000); 																					// Врубаем визитку! Буквы сразу полетят на стекло по SPI
+            spice(40000); 																					// Врубаем визитку! Буквы сразу полетят на стекло по SPI
             
             
  
@@ -967,7 +1076,7 @@ uint8_t startup_seconds = 0;
 
 
 
-				SSD1322_DrawAleksFull(35, 20, 1000);												// Пример вызова: X=30 (байт), Y=20 (строка)
+				SSD1322_DrawAleksFull(35, 20, 1500);												// Пример вызова: X=30 (байт), Y=20 (строка)
 				uint16_t last_encoder_value = 0; 														// Наш эталон для сравнения ручки
 				menu_need_update = 1; 																			// Принудительный запуск экрана при старте прибора
 				menu_level = 1;       																			// Принудительно открываем шлагбаум для крутилки со старта!

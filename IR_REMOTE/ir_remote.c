@@ -85,7 +85,7 @@ if ((duration > 9500 && duration < 10300) && (ir_state == 0)) {
     
 								if (ir_rx_buffer[2] == 0x5E || ir_rx_buffer[2] == 0x5D || ir_rx_buffer[2] == 0x02) {					// Если прилетел байт одной из трех проблемных кнопок
 								NVIC_DisableIRQ(EXTI9_5_IRQn); // ВЫРУБИЛИ АВТОМАТ! Пульт ослеп наглухо
-								ir_delay_counter = 300;        // Запустили задержку на 300 	
+								ir_delay_counter = 500;        // Запустили задержку на 300 	
 								ir_state = IR_STATE_IDLE;
     }
 
